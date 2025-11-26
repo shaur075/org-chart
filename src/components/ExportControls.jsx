@@ -15,11 +15,11 @@ const ExportControls = ({ data, chartId, nodes, edges }) => {
                 <FileText size={18} /> PDF
             </button>
 
-            <button className="btn" onClick={() => exportToPPTX(nodes, edges)} title="Export as PPTX">
+            <button className="btn" onClick={() => exportToPPTX('org-chart-container', nodes)} title="Export as PPTX">
                 <Presentation size={18} /> PPTX
             </button>
 
-            <button className="btn" onClick={() => exportToDOCX(data)} title="Export as DOCX">
+            <button className="btn" onClick={() => exportToDOCX('org-chart-container', nodes)} title="Export as DOCX">
                 <Download size={18} /> DOCX
             </button>
         </div>

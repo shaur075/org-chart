@@ -239,13 +239,13 @@ const OrgChartInner = (props) => {
         });
 
         // Handle NaN if totalAnnual is 0 or invalid
-        totalAnnual = totalAnnual || 0;
+        const totalMonthly = totalAnnual || 0;
 
-        const monthly = totalAnnual / 12; // Assuming monthly is annual / 12
+        const annual = totalMonthly * 12;
 
         return {
-            monthly,
-            annual: totalAnnual
+            monthly: totalMonthly,
+            annual: annual
         };
     }, [nodes, props.showSalary]);
 
@@ -269,7 +269,7 @@ const OrgChartInner = (props) => {
                 <Controls />
                 <MiniMap />
                 <Background variant="dots" gap={12} size={1} />
-                <Panel position="top-right">
+                <Panel position="top-right" className="instruction-panel">
                     <div style={{ background: 'rgba(255,255,255,0.8)', padding: '5px 10px', borderRadius: '5px', fontSize: '12px' }}>
                         Scroll to Zoom • Drag to Pan • Drag Node to Change Supervisor
                     </div>

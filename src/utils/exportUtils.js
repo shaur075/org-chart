@@ -58,7 +58,8 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background' // Remove dotted background
+                        'react-flow__background', // Remove dotted background
+                        'instruction-panel'
                     ];
 
                     classesToRemove.forEach(className => {
@@ -125,7 +126,8 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background' // Remove dotted background
+                        'react-flow__background', // Remove dotted background
+                        'instruction-panel'
                     ];
 
                     classesToRemove.forEach(className => {
@@ -196,7 +198,8 @@ export const exportToPPTX = async (elementId, nodes) => {
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background'
+                        'react-flow__background',
+                        'instruction-panel'
                     ];
 
                     classesToRemove.forEach(className => {
@@ -277,7 +280,8 @@ export const exportToDOCX = async (elementId, nodes) => {
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background'
+                        'react-flow__background',
+                        'instruction-panel'
                     ];
 
                     classesToRemove.forEach(className => {
