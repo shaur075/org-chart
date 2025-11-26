@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>org-chart</title>
+</head>
+
+<body>
+  <div id="root">
+    <div
+      style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; flex-direction: column;">
+      <h1>Loading Org Chart...</h1>
+      <p>If this message persists, check the console for errors.</p>
+    </div>
+  </div>
+  <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Global Error:", message, source, lineno, colno, error);
+        var errorDiv = document.createElement('div');
+        errorDiv.style.position = 'fixed';
+        errorDiv.style.top = '0';
+        errorDiv.style.left = '0';
+        errorDiv.style.width = '100%';
+        errorDiv.style.backgroundColor = '#fee2e2';
+        errorDiv.style.color = '#dc2626';
+        errorDiv.style.padding = '20px';
+        errorDiv.style.zIndex = '9999';
+        errorDiv.style.fontFamily = 'monospace';
+        errorDiv.innerHTML = '<strong>Critical Error:</strong> ' + message + '<br><small>' + source + ':' + lineno + '</small>';
+        document.body.appendChild(errorDiv);
+      };
+  </script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
