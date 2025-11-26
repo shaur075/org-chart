@@ -252,7 +252,18 @@ function App() {
             <DataInput onDataLoaded={handleDataLoaded} initialData={editingData} />
           ) : (
             <>
-              <div className="glass-panel" style={{ marginBottom: 'var(--spacing-lg)', padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="glass-panel" style={{
+                marginBottom: 'var(--spacing-lg)',
+                padding: 'var(--spacing-md)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                position: 'sticky',
+                top: '10px',
+                zIndex: 100,
+                backdropFilter: 'blur(10px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)'
+              }}>
                 <h2 style={{ margin: 0 }}>Chart Loaded ({filteredData.length} employees)</h2>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <SearchBar data={filteredData} onSelect={(id) => setFocusNodeId(id)} />

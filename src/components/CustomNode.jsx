@@ -19,7 +19,7 @@ const CustomNode = ({ data }) => {
     return (
         <div style={{
             width: '250px',
-            minHeight: '160px',
+            minHeight: data.showSalary ? '160px' : '140px',
             height: 'auto',
             background: bgColor,
             borderRadius: '10px',
@@ -74,7 +74,7 @@ const CustomNode = ({ data }) => {
 
                 {/* Render Custom Fields */}
                 {Object.entries(data).map(([key, value]) => {
-                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type'].includes(key)) return null;
+                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary'].includes(key)) return null;
                     if (!value) return null;
                     return (
                         <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '12px', marginTop: '2px' }}>

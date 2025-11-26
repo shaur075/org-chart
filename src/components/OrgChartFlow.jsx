@@ -238,16 +238,19 @@ const OrgChartInner = (props) => {
             }
         });
 
+        // Handle NaN if totalAnnual is 0 or invalid
+        totalAnnual = totalAnnual || 0;
+
         const monthly = totalAnnual / 12; // Assuming monthly is annual / 12
 
         return {
             monthly,
-            annual: totalAnnual.toLocaleString()
+            annual: totalAnnual
         };
     }, [nodes, props.showSalary]);
 
     const formatCurrency = (val) => {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+        return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(val);
     };
 
     return (

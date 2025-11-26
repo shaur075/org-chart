@@ -162,46 +162,77 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     }
 };
 
-export const exportToPPTX = async (data, chartId) => {
+export const exportToPPTX = async (elementId, nodes) => {
     try {
-        const element = document.getElementById(chartId);
+        const element = document.getElementById(elementId);
         if (!element) {
-            console.error(`Element with id ${chartId} not found`);
+            console.error(`Element with id ${elementId} not found`);
             return;
         }
 
-        // Capture the chart as an image
+        const bounds = getGraphBounds(nodes);
+        const padding = 200;
+        const targetWidth = bounds.width + padding * 2;
+        const targetHeight = bounds.height + padding * 2;
+
         const canvas = await html2canvas(element, {
-            scale: 2, // High resolution
-            useCORS: true,
-            backgroundColor: '#f0f2f5', // Match app background
-            ignoreElements: (node) => {
-                return node.classList && (
-                    node.classList.contains('react-flow__controls') ||
-                    node.classList.contains('react-flow__minimap') ||
-                    node.classList.contains('react-flow__attribution')
-                );
+            backgroundColor: '#ffffff',
+            scale: 2,
+            width: targetWidth,
+            height: targetHeight,
+            windowWidth: targetWidth,
+            windowHeight: targetHeight,
+            onclone: (clonedDoc) => {
+                const clonedElement = clonedDoc.getElementById(elementId);
+                if (clonedElement) {
+                    clonedElement.style.width = `${targetWidth}px`;
+                    clonedElement.style.height = `${targetHeight}px`;
+                    clonedElement.style.overflow = 'visible';
+                    clonedElement.style.position = 'absolute';
+                    clonedElement.style.top = '0';
+                    clonedElement.style.left = '0';
+
+                    const classesToRemove = [
+                        'react-flow__controls',
+                        'react-flow__minimap',
+                        'react-flow__attribution',
+                        'react-flow__background'
+                    ];
+
+                    classesToRemove.forEach(className => {
+                        const elements = clonedElement.querySelectorAll(`.${className}`);
+                        elements.forEach(el => el.remove());
+                    });
+
+                    const viewport = clonedElement.querySelector('.react-flow__viewport');
+                    if (viewport) {
+                        const translateX = -bounds.x + padding;
+                        const translateY = -bounds.y + padding;
+
+                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
+                        viewport.style.width = `${targetWidth}px`;
+                        viewport.style.height = `${targetHeight}px`;
+                    }
+                }
             }
         });
 
         const imgData = canvas.toDataURL('image/png');
 
-        // Create PPTX
         const pptx = new PptxGenJS();
         const slide = pptx.addSlide();
 
-        // Add title
         slide.addText("Organization Chart", { x: 0.5, y: 0.5, fontSize: 18, bold: true });
 
-        // Add image to slide
-        // Fit to slide (10x5.625 inches is default 16:9)
+        // Fit image to slide (keeping aspect ratio)
+        // Slide size is 10x5.625 inches
         slide.addImage({
             data: imgData,
             x: 0.5,
             y: 1.0,
             w: 9.0,
-            h: 4.5,
-            sizing: { type: 'contain', w: 9.0, h: 4.5 }
+            h: 4.0,
+            sizing: { type: 'contain', w: 9.0, h: 4.0 }
         });
 
         pptx.writeFile({ fileName: 'OrgChart.pptx' });
@@ -212,31 +243,63 @@ export const exportToPPTX = async (data, chartId) => {
     }
 };
 
-export const exportToDOCX = async (data, chartId) => {
+export const exportToDOCX = async (elementId, nodes) => {
     try {
-        const element = document.getElementById(chartId);
+        const element = document.getElementById(elementId);
         if (!element) {
-            console.error(`Element with id ${chartId} not found`);
+            console.error(`Element with id ${elementId} not found`);
             return;
         }
 
-        // Capture the chart as an image
+        const bounds = getGraphBounds(nodes);
+        const padding = 200;
+        const targetWidth = bounds.width + padding * 2;
+        const targetHeight = bounds.height + padding * 2;
+
         const canvas = await html2canvas(element, {
+            backgroundColor: '#ffffff',
             scale: 2,
-            useCORS: true,
-            backgroundColor: '#f0f2f5',
-            ignoreElements: (node) => {
-                return node.classList && (
-                    node.classList.contains('react-flow__controls') ||
-                    node.classList.contains('react-flow__minimap') ||
-                    node.classList.contains('react-flow__attribution')
-                );
+            width: targetWidth,
+            height: targetHeight,
+            windowWidth: targetWidth,
+            windowHeight: targetHeight,
+            onclone: (clonedDoc) => {
+                const clonedElement = clonedDoc.getElementById(elementId);
+                if (clonedElement) {
+                    clonedElement.style.width = `${targetWidth}px`;
+                    clonedElement.style.height = `${targetHeight}px`;
+                    clonedElement.style.overflow = 'visible';
+                    clonedElement.style.position = 'absolute';
+                    clonedElement.style.top = '0';
+                    clonedElement.style.left = '0';
+
+                    const classesToRemove = [
+                        'react-flow__controls',
+                        'react-flow__minimap',
+                        'react-flow__attribution',
+                        'react-flow__background'
+                    ];
+
+                    classesToRemove.forEach(className => {
+                        const elements = clonedElement.querySelectorAll(`.${className}`);
+                        elements.forEach(el => el.remove());
+                    });
+
+                    const viewport = clonedElement.querySelector('.react-flow__viewport');
+                    if (viewport) {
+                        const translateX = -bounds.x + padding;
+                        const translateY = -bounds.y + padding;
+
+                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
+                        viewport.style.width = `${targetWidth}px`;
+                        viewport.style.height = `${targetHeight}px`;
+                    }
+                }
             }
         });
 
         const imgData = canvas.toDataURL('image/png');
 
-        // Create DOCX
         const doc = new Document({
             sections: [{
                 properties: {},
@@ -246,7 +309,7 @@ export const exportToDOCX = async (data, chartId) => {
                             new TextRun({
                                 text: "Organization Chart",
                                 bold: true,
-                                size: 32, // 16pt
+                                size: 32,
                             }),
                         ],
                         spacing: { after: 400 },
@@ -257,7 +320,7 @@ export const exportToDOCX = async (data, chartId) => {
                                 data: Uint8Array.from(atob(imgData.split(',')[1]), c => c.charCodeAt(0)),
                                 transformation: {
                                     width: 600,
-                                    height: 400,
+                                    height: 400, // This might distort aspect ratio if not careful, but docx requires explicit size
                                 },
                             }),
                         ],
