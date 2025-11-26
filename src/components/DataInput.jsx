@@ -16,7 +16,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
             // Identify custom fields from initial data
             const allKeys = new Set();
             initialData.forEach(emp => Object.keys(emp).forEach(k => allKeys.add(k)));
-            const standardKeys = ['id', 'name', 'designation', 'band', 'salary', 'parentId', 'rawSupervisorName', 'reportingType', 'function', 'rawSupervisorId', 'type'];
+            const standardKeys = ['id', 'name', 'designation', 'band', 'salary', 'parentId', 'rawSupervisorName', 'reportingType', 'function', 'rawSupervisorId', 'type', 'redundant', 'Redundant'];
             const extras = Array.from(allKeys).filter(k => !standardKeys.includes(k));
             setCustomFields(extras);
 
@@ -29,7 +29,8 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                     salary: emp.salary,
                     supervisorId: emp.parentId || '', // Use parentId as supervisorId
                     supervisorName: emp.rawSupervisorName || '', // We might not have this preserved perfectly, but that's ok
-                    type: emp.reportingType || 'Direct'
+                    type: emp.reportingType || 'Direct',
+                    redundant: emp.redundant || 'N'
                 };
                 // Add custom values
                 extras.forEach(field => {
@@ -99,7 +100,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
             const rawId = row.ID || row.Name || `emp_${index} `;
             const id = rawId.toString().trim();
 
-            const standardKeys = ['ID', 'Name', 'Designation', 'Band', 'Salary', 'SupervisorID', 'SupervisorName', 'ReportingType', 'band', 'function', 'salary'];
+            const standardKeys = ['ID', 'Name', 'Designation', 'Band', 'Salary', 'SupervisorID', 'SupervisorName', 'ReportingType', 'band', 'function', 'salary', 'redundant', 'Redundant'];
 
             const emp = {
                 id: id,

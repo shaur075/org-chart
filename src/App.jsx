@@ -266,7 +266,7 @@ function App() {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)'
               }}>
                 <h2 style={{ margin: 0 }}>Chart Loaded ({filteredData.length} employees)</h2>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <SearchBar data={filteredData} onSelect={(id) => setFocusNodeId(id)} />
 
                   <button

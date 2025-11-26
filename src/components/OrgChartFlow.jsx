@@ -283,6 +283,7 @@ const OrgChartInner = (props) => {
                 nodeTypes={nodeTypes}
                 nodesDraggable={true}
                 fitView
+                fitViewOptions={{ padding: 0.2 }}
             >
                 <Controls />
                 <MiniMap />
@@ -293,7 +294,7 @@ const OrgChartInner = (props) => {
                     </div>
                 </Panel>
                 {props.showSalary && costs && (
-                    <Panel position="bottom-left">
+                    <Panel position="top-left">
                         <div style={{
                             background: 'var(--color-surface)',
                             padding: '15px',
