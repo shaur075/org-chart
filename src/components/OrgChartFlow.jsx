@@ -215,7 +215,7 @@ const OrgChartInner = (props) => {
     }, [nodes, props.onParentChange]);
 
     // Calculate costs
-    const calculateTotalCost = useMemo(() => {
+    const costs = useMemo(() => {
         if (!props.showSalary) return { monthly: 0, annual: 0 };
 
         let totalAnnual = 0;
