@@ -216,11 +216,16 @@ const OrgChartInner = (props) => {
 
     // Calculate costs
     const costs = useMemo(() => {
-        if (!props.showSalary) return { monthly: 0, annual: 0 };
+        if (!props.showSalary) return null;
 
-        let totalAnnual = 0;
+        let totalMonthlyAsIs = 0;
+        let totalMonthlyOptimized = 0;
+        let hasRedundancy = false;
+
         nodes.forEach(node => {
             const salaryStr = node.data.salary;
+            let monthlyAmount = 0;
+
             if (salaryStr) {
                 // Remove currency symbols and commas
                 let cleanStr = salaryStr.toString().replace(/[$,]/g, '').toLowerCase();
@@ -233,21 +238,34 @@ const OrgChartInner = (props) => {
 
                 const amount = parseFloat(cleanStr);
                 if (!isNaN(amount)) {
-                    totalAnnual += amount * multiplier;
+                    // Assume input is Monthly as per previous fix
+                    monthlyAmount = amount * multiplier;
                 }
+            }
+
+            totalMonthlyAsIs += monthlyAmount;
+
+            const isRedundant = node.data.redundant && (node.data.redundant.toString().toUpperCase() === 'Y' || node.data.redundant.toString().toUpperCase() === 'YES');
+            if (isRedundant) {
+                hasRedundancy = true;
+            } else {
+                totalMonthlyOptimized += monthlyAmount;
             }
         });
 
-        // Handle NaN if totalAnnual is 0 or invalid
-        const totalMonthly = totalAnnual || 0;
-
-        const annual = totalMonthly * 12;
+        const calculateMetrics = (monthly) => {
+            const annual = monthly * 12;
+            const loadedPercentage = props.loadedCostPercentage || 125;
+            const fullyLoaded = annual * (loadedPercentage / 100);
+            return { monthly, annual, fullyLoaded };
+        };
 
         return {
-            monthly: totalMonthly,
-            annual: annual
+            asIs: calculateMetrics(totalMonthlyAsIs),
+            optimized: calculateMetrics(totalMonthlyOptimized),
+            hasRedundancy
         };
-    }, [nodes, props.showSalary]);
+    }, [nodes, props.showSalary, props.loadedCostPercentage]);
 
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(val);
@@ -282,18 +300,48 @@ const OrgChartInner = (props) => {
                             borderRadius: '8px',
                             border: '1px solid var(--color-border)',
                             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                            minWidth: '200px'
+                            minWidth: costs.hasRedundancy ? '400px' : '250px'
                         }}>
                             <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)', paddingBottom: '5px' }}>
                                 Cost Analysis
                             </h3>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
-                                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.monthly)}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
-                                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.annual)}</span>
+
+                            <div style={{ display: 'flex', gap: '20px' }}>
+                                {/* As-Is Column */}
+                                <div style={{ flex: 1 }}>
+                                    {costs.hasRedundancy && <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline' }}>As-Is</div>}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.asIs.monthly)}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.asIs.annual)}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.asIs.fullyLoaded)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Optimized Column (only if redundancy exists) */}
+                                {costs.hasRedundancy && (
+                                    <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
+                                        <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.optimized.monthly)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.optimized.annual)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
+                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
+                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.optimized.fullyLoaded)}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </Panel>

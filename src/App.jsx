@@ -22,6 +22,7 @@ function App() {
   const [selectedDepartment, setSelectedDepartment] = useState('All');
   const [showStats, setShowStats] = useState(false);
   const [showSalary, setShowSalary] = useState(false);
+  const [loadedCostPercentage, setLoadedCostPercentage] = useState(125);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -292,6 +293,18 @@ function App() {
                     {showSalary ? '👁️ Hide Salary' : '👁️ Show Salary'}
                   </button>
 
+                  {showSalary && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.05)', padding: '5px 10px', borderRadius: '5px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Loaded Cost %:</span>
+                      <input
+                        type="number"
+                        value={loadedCostPercentage}
+                        onChange={(e) => setLoadedCostPercentage(Number(e.target.value))}
+                        style={{ width: '50px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                    </div>
+                  )}
+
                   <button
                     className="btn"
                     onClick={() => setShowStats(true)}
@@ -343,6 +356,7 @@ function App() {
                   focusNodeId={focusNodeId}
                   direction={layoutDirection}
                   showSalary={showSalary}
+                  loadedCostPercentage={loadedCostPercentage}
                   onParentChange={handleParentChange}
                   onLayoutChange={(nodes, edges) => {
                     setCurrentNodes(nodes);

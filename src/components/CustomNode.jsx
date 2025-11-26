@@ -1,9 +1,17 @@
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
-const CustomNode = ({ data }) => {
+const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Position.Bottom }) => {
     const isVacant = !data.name || data.name.toLowerCase() === 'vacant';
-    const borderStyle = isVacant ? '2px dashed #666' : '2px solid #333';
+
+    // Redundancy Check
+    const isRedundant = data.redundant && (data.redundant.toString().toUpperCase() === 'Y' || data.redundant.toString().toUpperCase() === 'YES');
+
+    let borderStyle = isVacant ? '2px dashed #666' : '2px solid #333';
+    if (isRedundant) {
+        borderStyle = '3px solid red';
+    }
+
     const bgColor = isVacant ? 'var(--color-bg)' : 'var(--color-surface)';
     const name = isVacant ? 'Vacant' : data.name;
     const getInitials = (fullName) => {
@@ -30,7 +38,7 @@ const CustomNode = ({ data }) => {
             fontFamily: "'Calibri', sans-serif",
             color: 'var(--color-text)'
         }}>
-            <Handle type="target" position={Position.Top} style={{ background: 'var(--color-text-muted)' }} />
+            <Handle type="target" position={targetPosition} style={{ background: 'var(--color-text-muted)' }} />
 
             {/* Avatar Circle */}
             <div style={{
@@ -74,7 +82,7 @@ const CustomNode = ({ data }) => {
 
                 {/* Render Custom Fields */}
                 {Object.entries(data).map(([key, value]) => {
-                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary'].includes(key)) return null;
+                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant'].includes(key)) return null;
                     if (!value) return null;
                     return (
                         <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '12px', marginTop: '2px' }}>
@@ -84,7 +92,7 @@ const CustomNode = ({ data }) => {
                 })}
             </div>
 
-            <Handle type="source" position={Position.Bottom} style={{ background: 'var(--color-text-muted)' }} />
+            <Handle type="source" position={sourcePosition} style={{ background: 'var(--color-text-muted)' }} />
         </div>
     );
 };

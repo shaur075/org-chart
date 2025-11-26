@@ -5,7 +5,7 @@ import { Upload, FileSpreadsheet, Plus, Trash2 } from 'lucide-react';
 const DataInput = ({ onDataLoaded, initialData }) => {
     const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'manual'
     const [manualData, setManualData] = useState([
-        { id: '1', name: '', designation: '', band: '', salary: '', supervisorId: '', supervisorName: '', type: 'Direct' }
+        { id: '1', name: '', designation: '', band: '', salary: '', supervisorId: '', supervisorName: '', type: 'Direct', redundant: 'N' }
     ]);
 
     const [customFields, setCustomFields] = useState([]);
@@ -67,7 +67,8 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                 'id': 'ID',
                 'band': 'band',
                 'function': 'function',
-                'salary': 'salary'
+                'salary': 'salary',
+                'redundant': 'Redundant'
             };
 
             const data = rows.slice(1).map(row => {
@@ -110,6 +111,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                 rawSupervisorId: row.SupervisorID ? row.SupervisorID.toString().trim() : null,
                 rawSupervisorName: row.SupervisorName || row.Supervisor || null,
                 reportingType: row.ReportingType || 'Direct',
+                redundant: row.Redundant || row.redundant || 'N'
             };
 
             // Copy custom fields
@@ -197,7 +199,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
     };
 
     const addRow = () => {
-        const newRow = { id: Date.now().toString(), name: '', designation: '', supervisorId: '', type: 'Direct' };
+        const newRow = { id: Date.now().toString(), name: '', designation: '', supervisorId: '', type: 'Direct', redundant: 'N' };
         customFields.forEach(f => newRow[f] = '');
         setManualData([...manualData, newRow]);
     };
@@ -228,7 +230,8 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                 Salary: row.salary,
                 SupervisorID: row.supervisorId,
                 SupervisorName: row.supervisorName,
-                ReportingType: row.type
+                ReportingType: row.type,
+                Redundant: row.redundant
             };
             customFields.forEach(f => obj[f] = row[f]);
             return obj;
@@ -320,6 +323,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                                     <th style={{ padding: '8px', width: '80px' }}>Sup. ID</th>
                                     <th style={{ padding: '8px', width: '150px' }}>Sup. Name</th>
                                     <th style={{ padding: '8px', width: '80px' }}>Type</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Redundant</th>
                                     {customFields.map(f => (
                                         <th key={f} style={{ padding: '8px', width: '100px' }}>{f}</th>
                                     ))}
@@ -396,7 +400,16 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                                                 style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             >
                                                 <option value="Direct">Direct</option>
-                                                <option value="Dotted">Dotted</option>
+                                            </select>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                            <select
+                                                value={row.redundant || 'N'}
+                                                onChange={(e) => handleManualChange(index, 'redundant', e.target.value)}
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
+                                            >
+                                                <option value="N">No</option>
+                                                <option value="Y">Yes</option>
                                             </select>
                                         </td>
                                         {customFields.map(f => (
