@@ -153,6 +153,7 @@ function App() {
       type: 'text',
       position: { x: 500, y: -100 },
       data: {
+        id,  // CRITICAL: pass id to data so onChange can use it
         text: 'New Text Note',
         fontSize: '24px',
         fontFamily: 'Arial',
