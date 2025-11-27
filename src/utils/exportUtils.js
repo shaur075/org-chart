@@ -125,6 +125,13 @@ export const exportToPPTX = async (elementId, nodes) => {
             return;
         }
 
+        // Hide instruction panel
+        const instructionPanel = element.querySelector('.instruction-panel');
+        const originalDisplay = instructionPanel ? instructionPanel.style.display : '';
+        if (instructionPanel) {
+            instructionPanel.style.display = 'none';
+        }
+
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -139,8 +146,14 @@ export const exportToPPTX = async (elementId, nodes) => {
                 return true;
             },
             width: element.scrollWidth,
-            height: element.scrollHeight
+            height: element.scrollHeight,
+            pixelRatio: 2
         });
+
+        // Restore instruction panel
+        if (instructionPanel) {
+            instructionPanel.style.display = originalDisplay;
+        }
 
         const pptx = new PptxGenJS();
         const slide = pptx.addSlide();
@@ -168,6 +181,13 @@ export const exportToDOCX = async (elementId, nodes) => {
             return;
         }
 
+        // Hide instruction panel
+        const instructionPanel = element.querySelector('.instruction-panel');
+        const originalDisplay = instructionPanel ? instructionPanel.style.display : '';
+        if (instructionPanel) {
+            instructionPanel.style.display = 'none';
+        }
+
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -182,8 +202,14 @@ export const exportToDOCX = async (elementId, nodes) => {
                 return true;
             },
             width: element.scrollWidth,
-            height: element.scrollHeight
+            height: element.scrollHeight,
+            pixelRatio: 2
         });
+
+        // Restore instruction panel
+        if (instructionPanel) {
+            instructionPanel.style.display = originalDisplay;
+        }
 
         const doc = new Document({
             sections: [{
