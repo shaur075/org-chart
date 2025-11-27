@@ -188,6 +188,9 @@ const OrgChartInner = (props) => {
             props.onLayoutChange(getNodes(), getEdges());
         }
 
+        // Ignore text nodes for supervisor change
+        if (node.type === 'text') return;
+
         // Check if dropped on another node
         // We need to find if the dragged node overlaps with any other node
         const draggedNodeRect = {

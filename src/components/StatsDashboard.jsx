@@ -111,25 +111,6 @@ const StatsDashboard = ({ data, onClose }) => {
                         color="purple"
                     />
                 </div>
-
-                <h3 style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '10px', marginBottom: '15px' }}>
-                    Department Breakdown
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {stats.departments.map(([dept, count]) => (
-                        <div key={dept} style={{ display: 'flex', alignItems: 'center' }}>
-                            <div style={{ width: '150px', fontSize: '0.9rem', fontWeight: '500' }}>{dept}</div>
-                            <div style={{ flex: 1, height: '8px', background: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                                <div style={{
-                                    width: `${(count / stats.totalHeadcount) * 100}%`,
-                                    height: '100%',
-                                    background: 'var(--color-primary)'
-                                }}></div>
-                            </div>
-                            <div style={{ width: '50px', textAlign: 'right', fontSize: '0.9rem', fontWeight: 'bold' }}>{count}</div>
-                        </div>
-                    ))}
-                </div>
             </div>
         </div>
     );

@@ -154,16 +154,18 @@ function App() {
       position: { x: 100, y: 100 },
       data: {
         text: 'New Text Note',
-        onChange: (id, val) => updateTextNode(id, val)
+        fontSize: '14px',
+        fontFamily: 'Arial',
+        onChange: (id, updates) => updateTextNode(id, updates)
       },
     };
     setTextNodes((nds) => [...nds, newNode]);
   };
 
-  const updateTextNode = (id, text) => {
+  const updateTextNode = (id, updates) => {
     setTextNodes((nds) => nds.map((n) => {
       if (n.id === id) {
-        return { ...n, data: { ...n.data, text } };
+        return { ...n, data: { ...n.data, ...updates } };
       }
       return n;
     }));

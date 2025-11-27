@@ -100,7 +100,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
             const rawId = row.ID || row.Name || `emp_${index} `;
             const id = rawId.toString().trim();
 
-            const standardKeys = ['ID', 'Name', 'Designation', 'Band', 'Salary', 'SupervisorID', 'SupervisorName', 'ReportingType', 'band', 'function', 'salary', 'redundant', 'Redundant'];
+            const standardKeys = ['ID', 'Name', 'Designation', 'Band', 'Salary', 'SupervisorID', 'SupervisorName', 'ReportingType', 'band', 'function', 'salary', 'redundant', 'Redundant', 'supervisorid', 'supervisorname', 'supervisor', 'Supervisor'];
 
             const emp = {
                 id: id,
@@ -117,7 +117,9 @@ const DataInput = ({ onDataLoaded, initialData }) => {
 
             // Copy custom fields
             Object.keys(row).forEach(key => {
-                if (!standardKeys.includes(key)) {
+                // Case insensitive check for standard keys
+                const isStandard = standardKeys.some(k => k.toLowerCase() === key.toLowerCase());
+                if (!isStandard) {
                     emp[key] = row[key];
                 }
             });

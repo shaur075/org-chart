@@ -110,21 +110,6 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                         placeholder="N/A"
                     />
                 </div>
-                <input
-                    value={data.function || ''}
-                    onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'function', e.target.value)}
-                    style={{
-                        color: 'var(--color-text-muted)',
-                        fontSize: '16px',
-                        marginBottom: '4px',
-                        background: 'transparent',
-                        border: 'none',
-                        textAlign: 'center',
-                        width: '100%',
-                        outline: 'none'
-                    }}
-                    placeholder="Function"
-                />
                 {data.showSalary && (
                     <input
                         value={data.salary || ''}
