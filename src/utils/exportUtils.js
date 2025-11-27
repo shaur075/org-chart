@@ -12,10 +12,18 @@ const getGraphBounds = (nodes) => {
     const validNodes = nodes.filter(n => n.position && typeof n.position.x === 'number' && typeof n.position.y === 'number');
     if (validNodes.length === 0) return { x: 0, y: 0, width: 1000, height: 1000 };
 
+    // Handle all node types including text nodes which may have negative positions
     const minX = Math.min(...validNodes.map(n => n.position.x));
     const minY = Math.min(...validNodes.map(n => n.position.y));
-    const maxX = Math.max(...validNodes.map(n => n.position.x + (n.width || 250)));
-    // Aggressive height assumption (400px) to ensure no clipping of long content/shadows
+
+    // For width/height, use generous defaults to catch all content
+    // Text nodes typically have smaller width, org nodes are 250px
+    const maxX = Math.max(...validNodes.map(n => n.position.x + (n.width || n.measured?.width || 250)));
+
+    // For height, account for:
+    // - Org nodes: dynamic height (160-400px)
+    // - Text nodes: usually smaller (100-200px)
+    // - Panel overlays (cost analysis): can be 200-300px
     const maxY = Math.max(...validNodes.map(n => n.position.y + (n.measured?.height || n.height || 400)));
 
     return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
@@ -28,8 +36,8 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
     // 1. Calculate the full bounds of the graph
     const bounds = getGraphBounds(nodes);
 
-    // Add aggressive padding
-    const padding = 100; // Reduced padding since we are handling viewport better, but keep it safe
+    // Add aggressive padding to capture cost panel and all nodes
+    const padding = 200;
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -109,7 +117,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     if (!element) return;
 
     const bounds = getGraphBounds(nodes);
-    const padding = 100; // Aggressive padding
+    const padding = 200;
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
