@@ -13,6 +13,13 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
     }
 
     try {
+        // Hide instruction panel before export
+        const instructionPanel = element.querySelector('.instruction-panel');
+        const originalDisplay = instructionPanel ? instructionPanel.style.display : '';
+        if (instructionPanel) {
+            instructionPanel.style.display = 'none';
+        }
+
         // Use html-to-image instead of html2canvas for better React Flow support
         // Add extra padding to capture full vertical charts
         const extraPadding = 1500; // Extra padding for vertical charts
@@ -20,7 +27,7 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
             cacheBust: true,
             backgroundColor: '#ffffff',
             filter: (node) => {
-                // Exclude React Flow controls
+                // Exclude React Flow controls and panels
                 if (node.classList) {
                     return !node.classList.contains('react-flow__controls') &&
                         !node.classList.contains('react-flow__minimap') &&
@@ -34,8 +41,14 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
             style: {
                 transform: 'none',
                 transformOrigin: 'top left'
-            }
+            },
+            pixelRatio: 2
         });
+
+        // Restore instruction panel
+        if (instructionPanel) {
+            instructionPanel.style.display = originalDisplay;
+        }
 
         // Download the image
         const link = document.createElement('a');
@@ -56,6 +69,13 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     }
 
     try {
+        // Hide instruction panel
+        const instructionPanel = element.querySelector('.instruction-panel');
+        const originalDisplay = instructionPanel ? instructionPanel.style.display : '';
+        if (instructionPanel) {
+            instructionPanel.style.display = 'none';
+        }
+
         const extraPadding = 1500;
         const dataUrl = await toPng(element, {
             cacheBust: true,
@@ -71,11 +91,13 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
             },
             width: element.scrollWidth + extraPadding,
             height: element.scrollHeight + extraPadding,
-            style: {
-                transform: 'none',
-                transformOrigin: 'top left'
-            }
+            pixelRatio: 2
         });
+
+        // Restore instruction panel
+        if (instructionPanel) {
+            instructionPanel.style.display = originalDisplay;
+        }
 
         // Create PDF with the image
         const img = new Image();
