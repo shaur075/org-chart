@@ -143,6 +143,49 @@ function App() {
     setHistoryItems(updatedHistory);
   };
 
+  // Text Nodes State
+  const [textNodes, setTextNodes] = useState([]);
+
+  const addTextNode = () => {
+    const id = `text-${Date.now()}`;
+    const newNode = {
+      id,
+      type: 'text',
+      position: { x: 100, y: 100 },
+      data: {
+        text: 'New Text Note',
+        onChange: (id, val) => updateTextNode(id, val)
+      },
+    };
+    setTextNodes((nds) => [...nds, newNode]);
+  };
+
+  const updateTextNode = (id, text) => {
+    setTextNodes((nds) => nds.map((n) => {
+      if (n.id === id) {
+        return { ...n, data: { ...n.data, text } };
+      }
+      return n;
+    }));
+  };
+
+  const handleNodeDataChange = (nodeId, field, value) => {
+    if (!orgData) return;
+
+    const newData = orgData.map(emp => {
+      if (emp.id === nodeId) {
+        return { ...emp, [field]: value };
+      }
+      return emp;
+    });
+
+    setOrgData(newData);
+    // Debounce history save? For now, save on every change might be too much if typing. 
+    // But since we use onBlur in CustomNode (planned), it's fine.
+    const updatedHistory = saveChartToHistory(newData);
+    setHistoryItems(updatedHistory);
+  };
+
   return (
     <ErrorBoundary>
       <div className="container">
@@ -346,6 +389,7 @@ function App() {
                     nodes={currentNodes}
                     edges={currentEdges}
                   />
+                  <button className="btn" onClick={addTextNode}>Add Text</button>
                   <button className="btn" onClick={onEditClick}>Edit Data</button>
                   <button className="btn" onClick={() => { setOrgData(null); setEditingData(null); }}>Reset / New Chart</button>
                 </div>
@@ -357,7 +401,9 @@ function App() {
                   direction={layoutDirection}
                   showSalary={showSalary}
                   loadedCostPercentage={loadedCostPercentage}
+                  textNodes={textNodes}
                   onParentChange={handleParentChange}
+                  onNodeDataChange={handleNodeDataChange}
                   onLayoutChange={(nodes, edges) => {
                     setCurrentNodes(nodes);
                     setCurrentEdges(edges);

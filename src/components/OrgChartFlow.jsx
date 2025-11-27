@@ -71,8 +71,11 @@ const getLayoutedElements = (nodes, edges, direction = 'TB') => {
     return { nodes, edges };
 };
 
+import TextNode from './TextNode';
+
 const nodeTypes = {
     custom: CustomNode,
+    text: TextNode
 };
 
 const OrgChartInner = (props) => {
@@ -93,7 +96,10 @@ const OrgChartInner = (props) => {
                 band: emp.band,
                 function: emp.function,
                 salary: emp.salary,
-                showSalary: props.showSalary
+                function: emp.function,
+                salary: emp.salary,
+                showSalary: props.showSalary,
+                onNodeDataChange: props.onNodeDataChange
             },
             position: { x: 0, y: 0 }, // Initial position, will be set by dagre
         }));
@@ -114,25 +120,25 @@ const OrgChartInner = (props) => {
             }));
 
         return getLayoutedElements(nodes, edges, direction);
-    }, [data, direction, props.showSalary]);
+    }, [data, direction, props.showSalary, props.textNodes]); // Add textNodes dependency
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    // Update layout when data changes
+    // Initialize nodes with data + textNodes
     useEffect(() => {
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             initialNodes,
             initialEdges,
             direction
         );
-        setNodes([...layoutedNodes]);
-        setEdges([...layoutedEdges]);
 
-        if (onLayoutChange) {
-            onLayoutChange(layoutedNodes, layoutedEdges);
-        }
-    }, [initialNodes, initialEdges, setNodes, setEdges, onLayoutChange, direction]);
+        // Merge text nodes
+        const allNodes = [...layoutedNodes, ...(props.textNodes || [])];
+
+        setNodes(allNodes);
+        setEdges(layoutedEdges);
+    }, [initialNodes, initialEdges, direction, props.textNodes, setNodes, setEdges]);
 
     // Handle Focus Node
     useEffect(() => {
@@ -299,6 +305,8 @@ const OrgChartInner = (props) => {
                 nodesDraggable={true}
                 fitView
                 fitViewOptions={{ padding: 0.2 }}
+                minZoom={0.1}
+                maxZoom={4}
             >
                 <Controls />
                 <MiniMap />

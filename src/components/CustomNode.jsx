@@ -62,27 +62,91 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
             </div>
 
             <div style={{ padding: '20px', paddingTop: '35px', textAlign: 'center' }}>
-                <div style={{ color: 'var(--color-text)', fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
-                    {name}
+                <input
+                    value={name}
+                    onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'name', e.target.value)}
+                    style={{
+                        color: 'var(--color-text)',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        marginBottom: '4px',
+                        background: 'transparent',
+                        border: 'none',
+                        textAlign: 'center',
+                        width: '100%',
+                        outline: 'none'
+                    }}
+                    placeholder="Name"
+                />
+                <input
+                    value={data.designation || ''}
+                    onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'designation', e.target.value)}
+                    style={{
+                        color: 'var(--color-text-muted)',
+                        fontSize: '16px',
+                        marginBottom: '4px',
+                        background: 'transparent',
+                        border: 'none',
+                        textAlign: 'center',
+                        width: '100%',
+                        outline: 'none'
+                    }}
+                    placeholder="Designation"
+                />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: '16px' }}>Band:</span>
+                    <input
+                        value={data.band || ''}
+                        onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'band', e.target.value)}
+                        style={{
+                            color: 'var(--color-text-muted)',
+                            fontSize: '16px',
+                            background: 'transparent',
+                            border: 'none',
+                            textAlign: 'left',
+                            width: '50px',
+                            outline: 'none'
+                        }}
+                        placeholder="N/A"
+                    />
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
-                    {data.designation || 'No Designation'}
-                </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
-                    Band: {data.band || 'N/A'}
-                </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
-                    {data.function || ''}
-                </div>
-                {data.showSalary && data.salary && (
-                    <div style={{ color: 'var(--color-primary)', fontSize: '14px', fontWeight: 'bold', marginTop: '4px' }}>
-                        {data.salary}
-                    </div>
+                <input
+                    value={data.function || ''}
+                    onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'function', e.target.value)}
+                    style={{
+                        color: 'var(--color-text-muted)',
+                        fontSize: '16px',
+                        marginBottom: '4px',
+                        background: 'transparent',
+                        border: 'none',
+                        textAlign: 'center',
+                        width: '100%',
+                        outline: 'none'
+                    }}
+                    placeholder="Function"
+                />
+                {data.showSalary && (
+                    <input
+                        value={data.salary || ''}
+                        onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'salary', e.target.value)}
+                        style={{
+                            color: 'var(--color-primary)',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            marginTop: '4px',
+                            background: 'transparent',
+                            border: 'none',
+                            textAlign: 'center',
+                            width: '100%',
+                            outline: 'none'
+                        }}
+                        placeholder="Salary"
+                    />
                 )}
 
                 {/* Render Custom Fields */}
                 {Object.entries(data).map(([key, value]) => {
-                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant'].includes(key)) return null;
+                    if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant', 'onNodeDataChange'].includes(key)) return null;
                     if (!value) return null;
                     return (
                         <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginTop: '2px' }}>
