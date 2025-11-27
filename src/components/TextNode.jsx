@@ -59,14 +59,17 @@ const TextNode = ({ data, selected }) => {
     return (
         <div style={style} onDoubleClick={() => setIsEditing(true)}>
             {isEditing ? (
-                <div className="nodrag nopan" style={{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }} onMouseDown={(e) => e.stopPropagation()}>
+                {
+                    isEditing?(
+                <div style = {{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }} >
                     <div style={{ display: 'flex', gap: '5px' }}>
                         <select
                             className="nodrag"
                             value={localFontSize}
                             onChange={handleFontSizeChange}
-                            style={{ fontSize: '12px', padding: '2px' }}
+                            style={{ fontSize: '12px', padding: '2px', pointerEvents: 'all' }}
                             onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <option value="12px">Small</option>
                             <option value="14px">Medium</option>
@@ -78,8 +81,9 @@ const TextNode = ({ data, selected }) => {
                             className="nodrag"
                             value={localFontFamily}
                             onChange={handleFontFamilyChange}
-                            style={{ fontSize: '12px', padding: '2px' }}
+                            style={{ fontSize: '12px', padding: '2px', pointerEvents: 'all' }}
                             onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <option value="Arial, sans-serif">Arial</option>
                             <option value="'Times New Roman', serif">Times New Roman</option>
@@ -101,18 +105,21 @@ const TextNode = ({ data, selected }) => {
                             padding: '5px',
                             fontFamily: localFontFamily,
                             fontSize: localFontSize,
-                            resize: 'both'
+                            resize: 'both',
+                            pointerEvents: 'all'
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            ) : (
-                <div style={{ whiteSpace: 'pre-wrap' }}>
-                    {localText || 'Double click to edit text'}
-                </div>
-            )}
-            {/* Optional handles if we want to connect text to nodes? Maybe not for now. */}
+    ) : (
+        <div style={{ whiteSpace: 'pre-wrap' }}>
+            {localText || 'Double click to edit text'}
         </div>
+    )
+}
+{/* Optional handles if we want to connect text to nodes? Maybe not for now. */ }
+        </div >
     );
 };
 
