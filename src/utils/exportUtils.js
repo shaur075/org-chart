@@ -4,92 +4,36 @@ import PptxGenJS from 'pptxgenjs';
 import { Document, Packer, Paragraph, TextRun, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
-// SMART Helper: Get actual rendered bounds from DOM
-const getActualBounds = (elementId) => {
-    const element = document.getElementById(elementId);
-    if (!element) return { x: 0, y: 0, width: 1200, height: 800 };
-
-    // Find the viewport container
-    const viewport = element.querySelector('.react-flow__viewport');
-    if (!viewport) return { x: 0, y: 0, width: 1200, height: 800 };
-
-    // Get all nodes (both org chart and text nodes)
-    const nodes = viewport.querySelectorAll('.react-flow__node');
-    const edges = viewport.querySelector('.react-flow__edges');
-
-    if (nodes.length === 0) return { x: 0, y: 0, width: 1200, height: 800 };
-
-    // Calculate the actual bounding box from all rendered elements
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-    nodes.forEach(node => {
-        const rect = node.getBoundingClientRect();
-        const viewportRect = viewport.getBoundingClientRect();
-
-        // Convert to viewport-relative coordinates
-        const relX = rect.left - viewportRect.left;
-        const relY = rect.top - viewportRect.top;
-
-        minX = Math.min(minX, relX);
-        minY = Math.min(minY, relY);
-        maxX = Math.max(maxX, relX + rect.width);
-        maxY = Math.max(maxY, relY + rect.height);
-    });
-
-    // Also account for edges (connector lines) which might extend beyond nodes
-    if (edges) {
-        const edgesRect = edges.getBoundingClientRect();
-        const viewportRect = viewport.getBoundingClientRect();
-
-        const relX = edgesRect.left - viewportRect.left;
-        const relY = edgesRect.top - viewportRect.top;
-
-        minX = Math.min(minX, relX);
-        minY = Math.min(minY, relY);
-        maxX = Math.max(maxX, relX + edgesRect.width);
-        maxY = Math.max(maxY, relY + edgesRect.height);
-    }
-
-    return {
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY
-    };
-};
-
 export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') => {
     const element = document.getElementById(elementId);
     if (!element) return;
 
-    // Use ACTUAL DOM measurements
-    const bounds = getActualBounds(elementId);
-
-    // Add generous padding
-    const padding = 250;
-    const targetWidth = bounds.width + padding * 2;
-    const targetHeight = bounds.height + padding * 2;
+    // SIMPLE APPROACH: Use a very large canvas that will capture everything
+    // Let html2canvas figure out the rest
+    const targetWidth = 8000;  // Very large width
+    const targetHeight = 6000; // Very large height
 
     try {
         const canvas = await html2canvas(element, {
             backgroundColor: '#ffffff',
-            scale: 3,
+            scale: 2,
             width: targetWidth,
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
             x: 0,
             y: 0,
+            scrollX: 0,
+            scrollY: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
+                    // Make container huge
                     clonedElement.style.width = `${targetWidth}px`;
                     clonedElement.style.height = `${targetHeight}px`;
                     clonedElement.style.overflow = 'visible';
-                    clonedElement.style.position = 'absolute';
-                    clonedElement.style.top = '0';
-                    clonedElement.style.left = '0';
 
+                    // Remove UI elements
                     const classesToRemove = [
                         'react-flow__controls',
                         'react-flow__minimap',
@@ -103,18 +47,11 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                         elements.forEach(el => el.remove());
                     });
 
+                    // Reset viewport to show everything from top-left
                     const viewport = clonedElement.querySelector('.react-flow__viewport');
                     if (viewport) {
-                        const translateX = -bounds.x + padding;
-                        const translateY = -bounds.y + padding;
-                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                    }
-
-                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
-                    if (edgesSvg) {
-                        edgesSvg.style.overflow = 'visible';
-                        edgesSvg.style.width = '100%';
-                        edgesSvg.style.height = '100%';
+                        // Center the content in our large canvas
+                        viewport.style.transform = `translate(${targetWidth / 4}px, ${targetHeight / 4}px) scale(1)`;
                     }
                 }
             }
@@ -133,36 +70,33 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     const element = document.getElementById(elementId);
     if (!element) return;
 
-    const bounds = getActualBounds(elementId);
-    const padding = 250;
-    const targetWidth = bounds.width + padding * 2;
-    const targetHeight = bounds.height + padding * 2;
+    const targetWidth = 8000;
+    const targetHeight = 6000;
 
     try {
         const canvas = await html2canvas(element, {
-            backgroundColor: '#ffffff', // Set to white as requested
-            scale: 3,
+            backgroundColor: '#ffffff',
+            scale: 2,
             width: targetWidth,
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
             x: 0,
             y: 0,
+            scrollX: 0,
+            scrollY: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
                     clonedElement.style.width = `${targetWidth}px`;
                     clonedElement.style.height = `${targetHeight}px`;
                     clonedElement.style.overflow = 'visible';
-                    clonedElement.style.position = 'absolute';
-                    clonedElement.style.top = '0';
-                    clonedElement.style.left = '0';
 
                     const classesToRemove = [
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background', // Remove dotted background
+                        'react-flow__background',
                         'instruction-panel'
                     ];
 
@@ -171,21 +105,9 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
                         elements.forEach(el => el.remove());
                     });
 
-                    // 3. Reset Viewport Transform
                     const viewport = clonedElement.querySelector('.react-flow__viewport');
                     if (viewport) {
-                        const translateX = -bounds.x + padding;
-                        const translateY = -bounds.y + padding;
-
-                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                    }
-
-                    // 4. Ensure SVG edges are visible
-                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
-                    if (edgesSvg) {
-                        edgesSvg.style.overflow = 'visible';
-                        edgesSvg.style.width = '100%';
-                        edgesSvg.style.height = '100%';
+                        viewport.style.transform = `translate(${targetWidth / 4}px, ${targetHeight / 4}px) scale(1)`;
                     }
                 }
             }
@@ -193,7 +115,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
 
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
-            orientation: targetWidth > targetHeight ? 'landscape' : 'portrait',
+            orientation: 'landscape',
             unit: 'px',
             format: [targetWidth, targetHeight]
         });
