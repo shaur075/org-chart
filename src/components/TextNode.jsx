@@ -59,9 +59,7 @@ const TextNode = ({ data, selected }) => {
     return (
         <div style={style} onDoubleClick={() => setIsEditing(true)}>
             {isEditing ? (
-                {
-                    isEditing?(
-                <div style = {{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }} >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }}>
                     <div style={{ display: 'flex', gap: '5px' }}>
                         <select
                             className="nodrag"
@@ -112,13 +110,13 @@ const TextNode = ({ data, selected }) => {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-    ) : (
-        <div style={{ whiteSpace: 'pre-wrap' }}>
-            {localText || 'Double click to edit text'}
-        </div>
-    )
-}
-{/* Optional handles if we want to connect text to nodes? Maybe not for now. */ }
+            ) : (
+                <div style={{ whiteSpace: 'pre-wrap' }}>
+                    {localText || 'Double click to edit text'}
+                </div>
+            )
+            }
+            {/* Optional handles if we want to connect text to nodes? Maybe not for now. */}
         </div >
     );
 };
