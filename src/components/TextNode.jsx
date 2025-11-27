@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 
 const TextNode = ({ data, selected }) => {
@@ -7,8 +7,8 @@ const TextNode = ({ data, selected }) => {
     const [localFontSize, setLocalFontSize] = useState(data.fontSize || '24px');
     const [localFontFamily, setLocalFontFamily] = useState(data.fontFamily || 'Arial, sans-serif');
 
-    // Sync local state when entering edit mode or when props change (if not editing)
-    React.useEffect(() => {
+    // Sync local state when props change (if not editing)
+    useEffect(() => {
         if (!isEditing) {
             setLocalText(data.text);
             setLocalFontSize(data.fontSize || '24px');
@@ -47,7 +47,7 @@ const TextNode = ({ data, selected }) => {
         padding: '10px',
         borderRadius: '5px',
         background: data.bgColor || 'transparent',
-        border: selected ? '1px solid #555' : '1px solid transparent',
+        border: selected ? '2px solid #555' : '1px solid #ddd',
         minWidth: '150px',
         maxWidth: '400px',
         textAlign: 'left',
@@ -59,38 +59,8 @@ const TextNode = ({ data, selected }) => {
     return (
         <div style={style} onDoubleClick={() => setIsEditing(true)}>
             {isEditing ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }}>
-                    <div style={{ display: 'flex', gap: '5px' }}>
-                        <select
-                            className="nodrag"
-                            value={localFontSize}
-                            onChange={handleFontSizeChange}
-                            style={{ fontSize: '12px', padding: '2px', pointerEvents: 'all' }}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <option value="12px">Small</option>
-                            <option value="14px">Medium</option>
-                            <option value="18px">Large</option>
-                            <option value="24px">Extra Large</option>
-                            <option value="32px">Huge</option>
-                        </select>
-                        <select
-                            className="nodrag"
-                            value={localFontFamily}
-                            onChange={handleFontFamilyChange}
-                            style={{ fontSize: '12px', padding: '2px', pointerEvents: 'all' }}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <option value="Arial, sans-serif">Arial</option>
-                            <option value="'Times New Roman', serif">Times New Roman</option>
-                            <option value="'Courier New', monospace">Courier New</option>
-                            <option value="'Calibri', sans-serif">Calibri</option>
-                        </select>
-                    </div>
+                <div>
                     <textarea
-                        className="nodrag"
                         autoFocus
                         value={localText}
                         onChange={handleTextChange}
@@ -103,11 +73,8 @@ const TextNode = ({ data, selected }) => {
                             padding: '5px',
                             fontFamily: localFontFamily,
                             fontSize: localFontSize,
-                            resize: 'both',
-                            pointerEvents: 'all'
+                            resize: 'both'
                         }}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onClick={(e) => e.stopPropagation()}
                     />
                 </div>
             ) : (
@@ -115,9 +82,33 @@ const TextNode = ({ data, selected }) => {
                     {localText || 'Double click to edit text'}
                 </div>
             )}
-            {/* Optional handles if we want to connect text to nodes? Maybe not for now. */}
+            {selected && !isEditing && (
+                <div style={{ marginTop: '5px', display: 'flex', gap: '5px', borderTop: '1px solid #ddd', paddingTop: '5px' }}>
+                    <select
+                        value={localFontSize}
+                        onChange={handleFontSizeChange}
+                        style={{ fontSize: '11px', padding: '3px' }}
+                    >
+                        <option value="12px">Small</option>
+                        <option value="14px">Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="24px">Extra Large</option>
+                        <option value="32px">Huge</option>
+                    </select>
+                    <select
+                        value={localFontFamily}
+                        onChange={handleFontFamilyChange}
+                        style={{ fontSize: '11px', padding: '3px' }}
+                    >
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="'Calibri', sans-serif">Calibri</option>
+                    </select>
+                </div>
+            )}
         </div>
     );
 };
 
-export default memo(TextNode);
+export default TextNode;

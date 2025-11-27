@@ -4,60 +4,85 @@ import PptxGenJS from 'pptxgenjs';
 import { Document, Packer, Paragraph, TextRun, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
-// Helper to calculate graph bounds
-const getGraphBounds = (nodes) => {
-    if (!nodes || nodes.length === 0) return { x: 0, y: 0, width: 1000, height: 1000 };
+// SMART Helper: Get actual rendered bounds from DOM
+const getActualBounds = (elementId) => {
+    const element = document.getElementById(elementId);
+    if (!element) return { x: 0, y: 0, width: 1200, height: 800 };
 
-    // Safety check for nodes with missing position
-    const validNodes = nodes.filter(n => n.position && typeof n.position.x === 'number' && typeof n.position.y === 'number');
-    if (validNodes.length === 0) return { x: 0, y: 0, width: 1000, height: 1000 };
+    // Find the viewport container
+    const viewport = element.querySelector('.react-flow__viewport');
+    if (!viewport) return { x: 0, y: 0, width: 1200, height: 800 };
 
-    // Handle all node types including text nodes which may have negative positions
-    const minX = Math.min(...validNodes.map(n => n.position.x));
-    const minY = Math.min(...validNodes.map(n => n.position.y));
+    // Get all nodes (both org chart and text nodes)
+    const nodes = viewport.querySelectorAll('.react-flow__node');
+    const edges = viewport.querySelector('.react-flow__edges');
 
-    // For width/height, use generous defaults to catch all content
-    // Text nodes typically have smaller width, org nodes are 250px
-    // Add extra 100px to account for connector lines extending beyond nodes
-    const maxX = Math.max(...validNodes.map(n => n.position.x + (n.width || n.measured?.width || 350)));
+    if (nodes.length === 0) return { x: 0, y: 0, width: 1200, height: 800 };
 
-    // For height, account for:
-    // - Org nodes: dynamic height (160-400px)
-    // - Text nodes: usually smaller (100-200px)
-    // - Panel overlays (cost analysis): can be 200-300px
-    // - Connector lines extending beyond: +100px
-    const maxY = Math.max(...validNodes.map(n => n.position.y + (n.measured?.height || n.height || 500)));
+    // Calculate the actual bounding box from all rendered elements
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    nodes.forEach(node => {
+        const rect = node.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+
+        // Convert to viewport-relative coordinates
+        const relX = rect.left - viewportRect.left;
+        const relY = rect.top - viewportRect.top;
+
+        minX = Math.min(minX, relX);
+        minY = Math.min(minY, relY);
+        maxX = Math.max(maxX, relX + rect.width);
+        maxY = Math.max(maxY, relY + rect.height);
+    });
+
+    // Also account for edges (connector lines) which might extend beyond nodes
+    if (edges) {
+        const edgesRect = edges.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+
+        const relX = edgesRect.left - viewportRect.left;
+        const relY = edgesRect.top - viewportRect.top;
+
+        minX = Math.min(minX, relX);
+        minY = Math.min(minY, relY);
+        maxX = Math.max(maxX, relX + edgesRect.width);
+        maxY = Math.max(maxY, relY + edgesRect.height);
+    }
+
+    return {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+    };
 };
 
 export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') => {
     const element = document.getElementById(elementId);
     if (!element) return;
 
-    // 1. Calculate the full bounds of the graph
-    const bounds = getGraphBounds(nodes);
+    // Use ACTUAL DOM measurements
+    const bounds = getActualBounds(elementId);
 
-    // Add aggressive padding to capture cost panel and all nodes
-    const padding = 200;
+    // Add generous padding
+    const padding = 250;
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
     try {
         const canvas = await html2canvas(element, {
-            backgroundColor: '#ffffff', // Set to white as requested
-            scale: 3, // High quality
+            backgroundColor: '#ffffff',
+            scale: 3,
             width: targetWidth,
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
             x: 0,
             y: 0,
-            // We use onclone to modify the DOM before capture
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
-                    // 1. Force the container to be large enough to fit the whole graph
                     clonedElement.style.width = `${targetWidth}px`;
                     clonedElement.style.height = `${targetHeight}px`;
                     clonedElement.style.overflow = 'visible';
@@ -65,12 +90,11 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                     clonedElement.style.top = '0';
                     clonedElement.style.left = '0';
 
-                    // 2. Remove unwanted UI elements from the clone
                     const classesToRemove = [
                         'react-flow__controls',
                         'react-flow__minimap',
                         'react-flow__attribution',
-                        'react-flow__background', // Remove dotted background
+                        'react-flow__background',
                         'instruction-panel'
                     ];
 
@@ -79,22 +103,13 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                         elements.forEach(el => el.remove());
                     });
 
-                    // 3. Reset Viewport Transform
-                    // This is CRITICAL. React Flow applies a transform to .react-flow__viewport
-                    // We need to reset it so the graph starts at (0,0) relative to our container
                     const viewport = clonedElement.querySelector('.react-flow__viewport');
                     if (viewport) {
-                        // Calculate the transform needed to move the top-left of the graph to (padding, padding)
-                        // The graph starts at (bounds.x, bounds.y)
-                        // We want it at (padding, padding)
                         const translateX = -bounds.x + padding;
                         const translateY = -bounds.y + padding;
-
                         viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                        // Do NOT set width/height on viewport, let it be naturally sized or overflow
                     }
 
-                    // 4. Ensure SVG edges are visible
                     const edgesSvg = clonedElement.querySelector('.react-flow__edges');
                     if (edgesSvg) {
                         edgesSvg.style.overflow = 'visible';
@@ -118,8 +133,8 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     const element = document.getElementById(elementId);
     if (!element) return;
 
-    const bounds = getGraphBounds(nodes);
-    const padding = 200;
+    const bounds = getActualBounds(elementId);
+    const padding = 250;
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -199,8 +214,8 @@ export const exportToPPTX = async (elementId, nodes) => {
             return;
         }
 
-        const bounds = getGraphBounds(nodes);
-        const padding = 200;
+        const bounds = getActualBounds(elementId);
+        const padding = 250;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
@@ -289,8 +304,8 @@ export const exportToDOCX = async (elementId, nodes) => {
             return;
         }
 
-        const bounds = getGraphBounds(nodes);
-        const padding = 200;
+        const bounds = getActualBounds(elementId);
+        const padding = 250;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
