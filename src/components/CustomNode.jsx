@@ -62,20 +62,20 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
             </div>
 
             <div style={{ padding: '20px', paddingTop: '35px', textAlign: 'center' }}>
-                <div style={{ color: 'var(--color-text)', fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ color: 'var(--color-text)', fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
                     {name}
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginBottom: '4px' }}>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
                     {data.designation || 'No Designation'}
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginBottom: '4px' }}>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
                     Band: {data.band || 'N/A'}
                 </div>
-                <div style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginBottom: '4px' }}>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginBottom: '4px' }}>
                     {data.function || ''}
                 </div>
                 {data.showSalary && data.salary && (
-                    <div style={{ color: 'var(--color-primary)', fontSize: '12px', fontWeight: 'bold', marginTop: '4px' }}>
+                    <div style={{ color: 'var(--color-primary)', fontSize: '14px', fontWeight: 'bold', marginTop: '4px' }}>
                         {data.salary}
                     </div>
                 )}
@@ -85,7 +85,7 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                     if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant'].includes(key)) return null;
                     if (!value) return null;
                     return (
-                        <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '12px', marginTop: '2px' }}>
+                        <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginTop: '2px' }}>
                             <span style={{ fontWeight: '500', textTransform: 'capitalize' }}>{key}:</span> {value}
                         </div>
                     );

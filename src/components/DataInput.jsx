@@ -401,6 +401,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                                                 style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             >
                                                 <option value="Direct">Direct</option>
+                                                <option value="Dotted">Dotted</option>
                                             </select>
                                         </td>
                                         <td style={{ padding: '8px' }}>
