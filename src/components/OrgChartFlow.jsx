@@ -120,7 +120,7 @@ const OrgChartInner = (props) => {
             }));
 
         return getLayoutedElements(nodes, edges, direction);
-    }, [data, direction, props.showSalary, props.textNodes]); // Add textNodes dependency
+    }, [data, direction, props.showSalary]); // Removed props.textNodes dependency
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);

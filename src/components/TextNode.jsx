@@ -20,7 +20,7 @@ const TextNode = ({ data, selected }) => {
     return (
         <div style={style} onDoubleClick={() => setIsEditing(true)}>
             {isEditing ? (
-                <div className="nodrag" style={{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }}>
+                <div className="nodrag nopan" style={{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }}>
                     <div style={{ display: 'flex', gap: '5px' }}>
                         <select
                             className="nodrag"

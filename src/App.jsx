@@ -151,7 +151,7 @@ function App() {
     const newNode = {
       id,
       type: 'text',
-      position: { x: 0, y: -200 },
+      position: { x: 500, y: -100 },
       data: {
         text: 'New Text Note',
         fontSize: '24px',
