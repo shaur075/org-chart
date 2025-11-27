@@ -198,7 +198,7 @@ export const exportToPPTX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 100;
+        const padding = 200;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
@@ -288,7 +288,7 @@ export const exportToDOCX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 100;
+        const padding = 200;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
