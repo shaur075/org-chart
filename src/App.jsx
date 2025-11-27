@@ -151,10 +151,10 @@ function App() {
     const newNode = {
       id,
       type: 'text',
-      position: { x: 100, y: 100 },
+      position: { x: 0, y: -200 },
       data: {
         text: 'New Text Note',
-        fontSize: '14px',
+        fontSize: '24px',
         fontFamily: 'Arial',
         onChange: (id, updates) => updateTextNode(id, updates)
       },

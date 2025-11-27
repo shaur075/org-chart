@@ -20,20 +20,25 @@ const TextNode = ({ data, selected }) => {
     return (
         <div style={style} onDoubleClick={() => setIsEditing(true)}>
             {isEditing ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                {
+                    isEditing?(
+                <div className = "nodrag" style = {{ display: 'flex', flexDirection: 'column', gap: '5px', cursor: 'default' }} >
                     <div style={{ display: 'flex', gap: '5px' }}>
                         <select
-                            value={data.fontSize || '14px'}
+                            className="nodrag"
+                            value={data.fontSize || '24px'}
                             onChange={(e) => data.onChange(data.id, { fontSize: e.target.value })}
                             style={{ fontSize: '12px', padding: '2px' }}
-                            onMouseDown={(e) => e.stopPropagation()} // Prevent drag start
+                            onMouseDown={(e) => e.stopPropagation()}
                         >
                             <option value="12px">Small</option>
                             <option value="14px">Medium</option>
                             <option value="18px">Large</option>
                             <option value="24px">Extra Large</option>
+                            <option value="32px">Huge</option>
                         </select>
                         <select
+                            className="nodrag"
                             value={data.fontFamily || 'Arial, sans-serif'}
                             onChange={(e) => data.onChange(data.id, { fontFamily: e.target.value })}
                             style={{ fontSize: '12px', padding: '2px' }}
@@ -46,6 +51,7 @@ const TextNode = ({ data, selected }) => {
                         </select>
                     </div>
                     <textarea
+                        className="nodrag"
                         autoFocus
                         value={data.text}
                         onChange={(e) => data.onChange(data.id, { text: e.target.value })}
@@ -60,15 +66,17 @@ const TextNode = ({ data, selected }) => {
                             fontSize: data.fontSize || 'inherit',
                             resize: 'both'
                         }}
+                        onMouseDown={(e) => e.stopPropagation()}
                     />
                 </div>
-            ) : (
-                <div style={{ whiteSpace: 'pre-wrap' }}>
-                    {data.text || 'Double click to edit text'}
-                </div>
-            )}
-            {/* Optional handles if we want to connect text to nodes? Maybe not for now. */}
+    ) : (
+        <div style={{ whiteSpace: 'pre-wrap' }}>
+            {data.text || 'Double click to edit text'}
         </div>
+    )
+}
+{/* Optional handles if we want to connect text to nodes? Maybe not for now. */ }
+        </div >
     );
 };
 

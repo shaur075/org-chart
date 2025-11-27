@@ -63,11 +63,12 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
 
             <div style={{ padding: '20px', paddingTop: '35px', textAlign: 'center' }}>
                 <input
+                    className="nodrag"
                     value={name}
                     onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'name', e.target.value)}
                     style={{
                         color: 'var(--color-text)',
-                        fontSize: '18px',
+                        fontSize: '22px',
                         fontWeight: 'bold',
                         marginBottom: '4px',
                         background: 'transparent',
@@ -79,11 +80,12 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                     placeholder="Name"
                 />
                 <input
+                    className="nodrag"
                     value={data.designation || ''}
                     onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'designation', e.target.value)}
                     style={{
                         color: 'var(--color-text-muted)',
-                        fontSize: '16px',
+                        fontSize: '18px',
                         marginBottom: '4px',
                         background: 'transparent',
                         border: 'none',
@@ -94,17 +96,18 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                     placeholder="Designation"
                 />
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <span style={{ color: 'var(--color-text-muted)', fontSize: '16px' }}>Band:</span>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: '18px' }}>Band:</span>
                     <input
+                        className="nodrag"
                         value={data.band || ''}
                         onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'band', e.target.value)}
                         style={{
                             color: 'var(--color-text-muted)',
-                            fontSize: '16px',
+                            fontSize: '18px',
                             background: 'transparent',
                             border: 'none',
                             textAlign: 'left',
-                            width: '50px',
+                            width: '60px',
                             outline: 'none'
                         }}
                         placeholder="N/A"
@@ -112,11 +115,12 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                 </div>
                 {data.showSalary && (
                     <input
+                        className="nodrag"
                         value={data.salary || ''}
                         onChange={(e) => data.onNodeDataChange && data.onNodeDataChange(data.id, 'salary', e.target.value)}
                         style={{
                             color: 'var(--color-primary)',
-                            fontSize: '14px',
+                            fontSize: '18px',
                             fontWeight: 'bold',
                             marginTop: '4px',
                             background: 'transparent',
@@ -134,7 +138,7 @@ const CustomNode = ({ data, targetPosition = Position.Top, sourcePosition = Posi
                     if (['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant', 'onNodeDataChange'].includes(key)) return null;
                     if (!value) return null;
                     return (
-                        <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '14px', marginTop: '2px' }}>
+                        <div key={key} style={{ color: 'var(--color-text-muted)', fontSize: '16px', marginTop: '2px' }}>
                             <span style={{ fontWeight: '500', textTransform: 'capitalize' }}>{key}:</span> {value}
                         </div>
                     );
