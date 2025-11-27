@@ -77,7 +77,7 @@ const nodeTypes = {
 
 const OrgChartInner = (props) => {
     const { data, onLayoutChange, focusNodeId, direction = 'TB' } = props;
-    const { setCenter, fitView } = useReactFlow();
+    const { setCenter, fitView, getNodes, getEdges } = useReactFlow();
 
     // Transform flat data to React Flow nodes and edges
     const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
@@ -162,11 +162,26 @@ const OrgChartInner = (props) => {
     }, [focusNodeId, nodes, setCenter, setNodes]);
 
     const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge(params, eds)),
-        [setEdges]
+        (params) => {
+            setEdges((eds) => {
+                const newEdges = addEdge(params, eds);
+                if (props.onLayoutChange) {
+                    // Defer slightly to ensure state update? 
+                    // Better to use the new edges directly
+                    props.onLayoutChange(getNodes(), newEdges);
+                }
+                return newEdges;
+            });
+        },
+        [setEdges, props.onLayoutChange, getNodes]
     );
 
     const onNodeDragStop = useCallback((event, node) => {
+        // Sync with parent for export
+        if (props.onLayoutChange) {
+            props.onLayoutChange(getNodes(), getEdges());
+        }
+
         // Check if dropped on another node
         // We need to find if the dragged node overlaps with any other node
         const draggedNodeRect = {
@@ -181,7 +196,7 @@ const OrgChartInner = (props) => {
 
             // Calculate dynamic height for target node
             const baseHeight = n.data.showSalary ? 160 : 140;
-            const standardKeys = ['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary'];
+            const standardKeys = ['name', 'designation', 'band', 'function', 'salary', 'parentId', 'id', 'rawSupervisorId', 'rawSupervisorName', 'reportingType', 'type', 'showSalary', 'redundant'];
             const customFields = Object.entries(n.data).filter(([key, value]) =>
                 !standardKeys.includes(key) && value
             );
@@ -212,7 +227,7 @@ const OrgChartInner = (props) => {
                 // Ideally we snap back. For now, the next render from props change will fix it.
             }
         }
-    }, [nodes, props.onParentChange]);
+    }, [nodes, props.onParentChange, props.onLayoutChange, getNodes, getEdges]);
 
     // Calculate costs
     const costs = useMemo(() => {

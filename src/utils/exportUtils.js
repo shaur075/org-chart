@@ -29,7 +29,7 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
     const bounds = getGraphBounds(nodes);
 
     // Add aggressive padding
-    const padding = 200;
+    const padding = 400;
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -100,7 +100,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     if (!element) return;
 
     const bounds = getGraphBounds(nodes);
-    const padding = 200; // Aggressive padding
+    const padding = 400; // Aggressive padding
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -173,7 +173,7 @@ export const exportToPPTX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 200;
+        const padding = 400;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
@@ -255,7 +255,7 @@ export const exportToDOCX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 200;
+        const padding = 400;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
