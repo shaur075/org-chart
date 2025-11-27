@@ -136,10 +136,8 @@ export const exportToPPTX = async (elementId, nodes) => {
             return;
         }
 
-        const bounds = getActualBounds(elementId);
-        const padding = 250;
-        const targetWidth = bounds.width + padding * 2;
-        const targetHeight = bounds.height + padding * 2;
+        const targetWidth = 8000;
+        const targetHeight = 6000;
 
         const canvas = await html2canvas(element, {
             backgroundColor: '#ffffff',
@@ -150,15 +148,14 @@ export const exportToPPTX = async (elementId, nodes) => {
             windowHeight: targetHeight,
             x: 0,
             y: 0,
+            scrollX: 0,
+            scrollY: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
                     clonedElement.style.width = `${targetWidth}px`;
                     clonedElement.style.height = `${targetHeight}px`;
                     clonedElement.style.overflow = 'visible';
-                    clonedElement.style.position = 'absolute';
-                    clonedElement.style.top = '0';
-                    clonedElement.style.left = '0';
 
                     const classesToRemove = [
                         'react-flow__controls',
@@ -175,18 +172,7 @@ export const exportToPPTX = async (elementId, nodes) => {
 
                     const viewport = clonedElement.querySelector('.react-flow__viewport');
                     if (viewport) {
-                        const translateX = -bounds.x + padding;
-                        const translateY = -bounds.y + padding;
-
-                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                    }
-
-                    // 4. Ensure SVG edges are visible
-                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
-                    if (edgesSvg) {
-                        edgesSvg.style.overflow = 'visible';
-                        edgesSvg.style.width = '100%';
-                        edgesSvg.style.height = '100%';
+                        viewport.style.transform = `translate(${targetWidth / 4}px, ${targetHeight / 4}px) scale(1)`;
                     }
                 }
             }
@@ -226,10 +212,8 @@ export const exportToDOCX = async (elementId, nodes) => {
             return;
         }
 
-        const bounds = getActualBounds(elementId);
-        const padding = 250;
-        const targetWidth = bounds.width + padding * 2;
-        const targetHeight = bounds.height + padding * 2;
+        const targetWidth = 8000;
+        const targetHeight = 6000;
 
         const canvas = await html2canvas(element, {
             backgroundColor: '#ffffff',
@@ -240,15 +224,14 @@ export const exportToDOCX = async (elementId, nodes) => {
             windowHeight: targetHeight,
             x: 0,
             y: 0,
+            scrollX: 0,
+            scrollY: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
                     clonedElement.style.width = `${targetWidth}px`;
                     clonedElement.style.height = `${targetHeight}px`;
                     clonedElement.style.overflow = 'visible';
-                    clonedElement.style.position = 'absolute';
-                    clonedElement.style.top = '0';
-                    clonedElement.style.left = '0';
 
                     const classesToRemove = [
                         'react-flow__controls',
@@ -265,18 +248,7 @@ export const exportToDOCX = async (elementId, nodes) => {
 
                     const viewport = clonedElement.querySelector('.react-flow__viewport');
                     if (viewport) {
-                        const translateX = -bounds.x + padding;
-                        const translateY = -bounds.y + padding;
-
-                        viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                    }
-
-                    // 4. Ensure SVG edges are visible
-                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
-                    if (edgesSvg) {
-                        edgesSvg.style.overflow = 'visible';
-                        edgesSvg.style.width = '100%';
-                        edgesSvg.style.height = '100%';
+                        viewport.style.transform = `translate(${targetWidth / 4}px, ${targetHeight / 4}px) scale(1)`;
                     }
                 }
             }
