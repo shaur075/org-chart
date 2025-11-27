@@ -138,53 +138,25 @@ export const exportToDOCX = async (elementId, nodes) => {
     try {
         const element = document.getElementById(elementId);
         if (!element) {
-            console.error(`Element with id ${elementId} not found`);
+            alert("Chart element not found!");
             return;
         }
 
-        const targetWidth = 8000;
-        const targetHeight = 6000;
-
-        const canvas = await html2canvas(element, {
+        const dataUrl = await toPng(element, {
+            cacheBust: true,
             backgroundColor: '#ffffff',
-            scale: 2,
-            width: targetWidth,
-            height: targetHeight,
-            windowWidth: targetWidth,
-            windowHeight: targetHeight,
-            x: 0,
-            y: 0,
-            scrollX: 0,
-            scrollY: 0,
-            onclone: (clonedDoc) => {
-                const clonedElement = clonedDoc.getElementById(elementId);
-                if (clonedElement) {
-                    clonedElement.style.width = `${targetWidth}px`;
-                    clonedElement.style.height = `${targetHeight}px`;
-                    clonedElement.style.overflow = 'visible';
-
-                    const classesToRemove = [
-                        'react-flow__controls',
-                        'react-flow__minimap',
-                        'react-flow__attribution',
-                        'react-flow__background',
-                        'instruction-panel'
-                    ];
-
-                    classesToRemove.forEach(className => {
-                        const elements = clonedElement.querySelectorAll(`.${className}`);
-                        elements.forEach(el => el.remove());
-                    });
-
-                    const viewport = clonedElement.querySelector('.react-flow__viewport');
-                    if (viewport) {
-                        viewport.style.transform = `translate(${targetWidth / 4}px, ${targetHeight / 4}px) scale(1)`;
-                    }
+            filter: (node) => {
+                if (node.classList) {
+                    return !node.classList.contains('react-flow__controls') &&
+                        !node.classList.contains('react-flow__minimap') &&
+                        !node.classList.contains('react-flow__attribution') &&
+                        !node.classList.contains('react-flow__background');
                 }
-            }
+                return true;
+            },
+            width: element.scrollWidth,
+            height: element.scrollHeight
         });
-
-        const imgData = canvas.toDataURL('image/png');
 
         const doc = new Document({
             sections: [{
@@ -203,10 +175,10 @@ export const exportToDOCX = async (elementId, nodes) => {
                     new Paragraph({
                         children: [
                             new ImageRun({
-                                data: Uint8Array.from(atob(imgData.split(',')[1]), c => c.charCodeAt(0)),
+                                data: Uint8Array.from(atob(dataUrl.split(',')[1]), c => c.charCodeAt(0)),
                                 transformation: {
                                     width: 600,
-                                    height: 400, // This might distort aspect ratio if not careful, but docx requires explicit size
+                                    height: 400,
                                 },
                             }),
                         ],
@@ -220,8 +192,6 @@ export const exportToDOCX = async (elementId, nodes) => {
 
     } catch (error) {
         console.error("Error exporting to DOCX:", error);
-        alert("Failed to export DOCX.");
+        alert("Failed to export DOCX. Error: " + error.message);
     }
 };
-
-
