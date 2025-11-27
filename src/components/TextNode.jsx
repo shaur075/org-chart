@@ -114,10 +114,9 @@ const TextNode = ({ data, selected }) => {
                 <div style={{ whiteSpace: 'pre-wrap' }}>
                     {localText || 'Double click to edit text'}
                 </div>
-            )
-            }
+            )}
             {/* Optional handles if we want to connect text to nodes? Maybe not for now. */}
-        </div >
+        </div>
     );
 };
 

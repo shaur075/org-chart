@@ -18,13 +18,15 @@ const getGraphBounds = (nodes) => {
 
     // For width/height, use generous defaults to catch all content
     // Text nodes typically have smaller width, org nodes are 250px
-    const maxX = Math.max(...validNodes.map(n => n.position.x + (n.width || n.measured?.width || 250)));
+    // Add extra 100px to account for connector lines extending beyond nodes
+    const maxX = Math.max(...validNodes.map(n => n.position.x + (n.width || n.measured?.width || 350)));
 
     // For height, account for:
     // - Org nodes: dynamic height (160-400px)
     // - Text nodes: usually smaller (100-200px)
     // - Panel overlays (cost analysis): can be 200-300px
-    const maxY = Math.max(...validNodes.map(n => n.position.y + (n.measured?.height || n.height || 400)));
+    // - Connector lines extending beyond: +100px
+    const maxY = Math.max(...validNodes.map(n => n.position.y + (n.measured?.height || n.height || 500)));
 
     return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 };
