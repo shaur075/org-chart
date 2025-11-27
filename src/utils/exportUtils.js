@@ -14,6 +14,8 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
 
     try {
         // Use html-to-image instead of html2canvas for better React Flow support
+        // Add extra padding to capture full vertical charts
+        const extraPadding = 500; // Extra padding for vertical charts
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -27,8 +29,8 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                 }
                 return true;
             },
-            width: element.scrollWidth,
-            height: element.scrollHeight,
+            width: element.scrollWidth + extraPadding,
+            height: element.scrollHeight + extraPadding,
             style: {
                 transform: 'none',
                 transformOrigin: 'top left'
@@ -54,6 +56,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     }
 
     try {
+        const extraPadding = 500;
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -66,8 +69,8 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
                 }
                 return true;
             },
-            width: element.scrollWidth,
-            height: element.scrollHeight,
+            width: element.scrollWidth + extraPadding,
+            height: element.scrollHeight + extraPadding,
             style: {
                 transform: 'none',
                 transformOrigin: 'top left'
