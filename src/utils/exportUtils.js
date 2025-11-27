@@ -29,7 +29,7 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
     const bounds = getGraphBounds(nodes);
 
     // Add aggressive padding
-    const padding = 400;
+    const padding = 100; // Reduced padding since we are handling viewport better, but keep it safe
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -41,6 +41,8 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
+            x: 0,
+            y: 0,
             // We use onclone to modify the DOM before capture
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
@@ -79,8 +81,15 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                         const translateY = -bounds.y + padding;
 
                         viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                        viewport.style.width = `${targetWidth}px`;
-                        viewport.style.height = `${targetHeight}px`;
+                        // Do NOT set width/height on viewport, let it be naturally sized or overflow
+                    }
+
+                    // 4. Ensure SVG edges are visible
+                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
+                    if (edgesSvg) {
+                        edgesSvg.style.overflow = 'visible';
+                        edgesSvg.style.width = '100%';
+                        edgesSvg.style.height = '100%';
                     }
                 }
             }
@@ -100,7 +109,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     if (!element) return;
 
     const bounds = getGraphBounds(nodes);
-    const padding = 400; // Aggressive padding
+    const padding = 100; // Aggressive padding
     const targetWidth = bounds.width + padding * 2;
     const targetHeight = bounds.height + padding * 2;
 
@@ -112,6 +121,8 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
+            x: 0,
+            y: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
@@ -142,8 +153,14 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
                         const translateY = -bounds.y + padding;
 
                         viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                        viewport.style.width = `${targetWidth}px`;
-                        viewport.style.height = `${targetHeight}px`;
+                    }
+
+                    // 4. Ensure SVG edges are visible
+                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
+                    if (edgesSvg) {
+                        edgesSvg.style.overflow = 'visible';
+                        edgesSvg.style.width = '100%';
+                        edgesSvg.style.height = '100%';
                     }
                 }
             }
@@ -173,7 +190,7 @@ export const exportToPPTX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 400;
+        const padding = 100;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
@@ -184,6 +201,8 @@ export const exportToPPTX = async (elementId, nodes) => {
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
+            x: 0,
+            y: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
@@ -213,8 +232,14 @@ export const exportToPPTX = async (elementId, nodes) => {
                         const translateY = -bounds.y + padding;
 
                         viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                        viewport.style.width = `${targetWidth}px`;
-                        viewport.style.height = `${targetHeight}px`;
+                    }
+
+                    // 4. Ensure SVG edges are visible
+                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
+                    if (edgesSvg) {
+                        edgesSvg.style.overflow = 'visible';
+                        edgesSvg.style.width = '100%';
+                        edgesSvg.style.height = '100%';
                     }
                 }
             }
@@ -255,7 +280,7 @@ export const exportToDOCX = async (elementId, nodes) => {
         }
 
         const bounds = getGraphBounds(nodes);
-        const padding = 400;
+        const padding = 100;
         const targetWidth = bounds.width + padding * 2;
         const targetHeight = bounds.height + padding * 2;
 
@@ -266,6 +291,8 @@ export const exportToDOCX = async (elementId, nodes) => {
             height: targetHeight,
             windowWidth: targetWidth,
             windowHeight: targetHeight,
+            x: 0,
+            y: 0,
             onclone: (clonedDoc) => {
                 const clonedElement = clonedDoc.getElementById(elementId);
                 if (clonedElement) {
@@ -295,8 +322,14 @@ export const exportToDOCX = async (elementId, nodes) => {
                         const translateY = -bounds.y + padding;
 
                         viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
-                        viewport.style.width = `${targetWidth}px`;
-                        viewport.style.height = `${targetHeight}px`;
+                    }
+
+                    // 4. Ensure SVG edges are visible
+                    const edgesSvg = clonedElement.querySelector('.react-flow__edges');
+                    if (edgesSvg) {
+                        edgesSvg.style.overflow = 'visible';
+                        edgesSvg.style.width = '100%';
+                        edgesSvg.style.height = '100%';
                     }
                 }
             }
@@ -341,3 +374,5 @@ export const exportToDOCX = async (elementId, nodes) => {
         alert("Failed to export DOCX.");
     }
 };
+
+
