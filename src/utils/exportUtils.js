@@ -154,7 +154,8 @@ export const exportToDOCX = async (elementId, nodes) => {
                     return !node.classList.contains('react-flow__controls') &&
                         !node.classList.contains('react-flow__minimap') &&
                         !node.classList.contains('react-flow__attribution') &&
-                        !node.classList.contains('react-flow__background');
+                        !node.classList.contains('react-flow__background') &&
+                        !node.classList.contains('instruction-panel');
                 }
                 return true;
             },
