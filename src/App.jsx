@@ -19,6 +19,10 @@ function App() {
   const [focusNodeId, setFocusNodeId] = useState(null);
   const [layoutDirection, setLayoutDirection] = useState('TB'); // 'TB' (Top-Bottom) or 'LR' (Left-Right)
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState('horizontal');
+
+  // Viewport controls from React Flow
+  const [viewportControls, setViewportControls] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState('All');
   const [showStats, setShowStats] = useState(false);
   const [showSalary, setShowSalary] = useState(false);
@@ -391,6 +395,9 @@ function App() {
                     chartId="org-chart-container"
                     nodes={currentNodes}
                     edges={currentEdges}
+                    getViewport={viewportControls?.getViewport}
+                    setViewport={viewportControls?.setViewport}
+                    fitView={viewportControls?.fitView}
                   />
                   <button className="btn" onClick={addTextNode}>Add Text</button>
                   <button className="btn" onClick={onEditClick}>Edit Data</button>
@@ -404,6 +411,7 @@ function App() {
                   direction={layoutDirection}
                   showSalary={showSalary}
                   loadedCostPercentage={loadedCostPercentage}
+                  onViewportReady={setViewportControls}
                   textNodes={textNodes}
                   onParentChange={handleParentChange}
                   onNodeDataChange={handleNodeDataChange}

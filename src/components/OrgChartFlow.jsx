@@ -79,8 +79,15 @@ const nodeTypes = {
 };
 
 const OrgChartInner = (props) => {
-    const { data, onLayoutChange, focusNodeId, direction = 'TB' } = props;
-    const { setCenter, fitView, getNodes, getEdges } = useReactFlow();
+    const { data, onLayoutChange, focusNodeId, direction = 'TB', onViewportReady } = props;
+    const { setCenter, fitView, getNodes, getEdges, getViewport, setViewport } = useReactFlow();
+
+    // Expose viewport controls to parent
+    React.useEffect(() => {
+        if (onViewportReady) {
+            onViewportReady({ getViewport, setViewport, fitView });
+        }
+    }, [onViewportReady, getViewport, setViewport, fitView]);
 
     // Transform flat data to React Flow nodes and edges
     const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
