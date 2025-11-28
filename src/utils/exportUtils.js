@@ -5,6 +5,41 @@ import { Document, Packer, Paragraph, TextRun, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 import { toPng } from 'html-to-image';
 
+// Helper function to calculate actual chart bounds from nodes
+const calculateChartBounds = (nodes) => {
+    if (!nodes || nodes.length === 0) {
+        return { minX: 0, minY: 0, maxX: 1200, maxY: 800, width: 1200, height: 800 };
+    }
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    nodes.forEach(node => {
+        if (node.position) {
+            const x = node.position.x;
+            const y = node.position.y;
+            const width = node.width || node.measured?.width || (node.type === 'text' ? 200 : 280);
+            const height = node.height || node.measured?.height || (node.type === 'text' ? 150 : 200);
+
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + width);
+            maxY = Math.max(maxY, y + height);
+        }
+    });
+
+    return {
+        minX,
+        minY,
+        maxX,
+        maxY,
+        width: maxX - minX,
+        height: maxY - minY
+    };
+};
+
 export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') => {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -20,9 +55,14 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
             instructionPanel.style.display = 'none';
         }
 
-        // Use html-to-image instead of html2canvas for better React Flow support
-        // Add extra padding to capture full vertical charts
-        const extraPadding = 1500; // Extra padding for vertical charts
+        // Calculate actual chart dimensions from nodes
+        const bounds = calculateChartBounds(nodes);
+        const padding = 100; // Reasonable padding
+
+        // Create large canvas with actual dimensions
+        const captureWidth = bounds.width + (padding * 2);
+        const captureHeight = bounds.height + (padding * 2);
+
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -36,13 +76,10 @@ export const exportToPNG = async (elementId, nodes, fileName = 'org-chart.png') 
                 }
                 return true;
             },
-            width: element.scrollWidth + extraPadding,
-            height: element.scrollHeight + extraPadding,
-            style: {
-                transform: 'none',
-                transformOrigin: 'top left'
-            },
-            pixelRatio: 2
+            width: captureWidth,
+            height: captureHeight,
+            pixelRatio: 3,  // High quality
+            skipFonts: false
         });
 
         // Restore instruction panel
@@ -76,7 +113,12 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
             instructionPanel.style.display = 'none';
         }
 
-        const extraPadding = 1500;
+        // Calculate actual chart dimensions
+        const bounds = calculateChartBounds(nodes);
+        const padding = 100;
+        const captureWidth = bounds.width + (padding * 2);
+        const captureHeight = bounds.height + (padding * 2);
+
         const dataUrl = await toPng(element, {
             cacheBust: true,
             backgroundColor: '#ffffff',
@@ -89,9 +131,10 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
                 }
                 return true;
             },
-            width: element.scrollWidth + extraPadding,
-            height: element.scrollHeight + extraPadding,
-            pixelRatio: 2
+            width: captureWidth,
+            height: captureHeight,
+            pixelRatio: 3,
+            skipFonts: false
         });
 
         // Restore instruction panel
