@@ -284,6 +284,7 @@ const OrgChartInner = (props) => {
     const costs = useMemo(() => {
         if (!props.showSalary) return null;
 
+        let nodesToCalculate = nodes;
         let rootName = '';
 
         // If a node is selected, filter for its subtree
