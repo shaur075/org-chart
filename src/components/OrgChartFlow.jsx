@@ -84,7 +84,6 @@ const OrgChartInner = (props) => {
     const { setCenter, fitView, getNodes, getEdges, getViewport, setViewport } = useReactFlow();
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const nodeRef = useRef(null); // Ref for Draggable
-    const nodeRef = useRef(null); // Ref for Draggable
 
     // Expose viewport controls to parent
     React.useEffect(() => {
