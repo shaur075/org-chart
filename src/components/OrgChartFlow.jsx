@@ -284,11 +284,15 @@ const OrgChartInner = (props) => {
     const costs = useMemo(() => {
         if (!props.showSalary) return null;
 
-        let nodesToCalculate = nodes;
+        let rootName = '';
 
         // If a node is selected, filter for its subtree
         if (selectedNodeId) {
             nodesToCalculate = getSubtreeNodes(nodes, edges, selectedNodeId);
+            const rootNode = nodes.find(n => n.id === selectedNodeId);
+            if (rootNode) {
+                rootName = rootNode.data.name;
+            }
         }
 
         let totalMonthlyAsIs = 0;
@@ -337,10 +341,11 @@ const OrgChartInner = (props) => {
             asIs: calculateMetrics(totalMonthlyAsIs),
             optimized: calculateMetrics(totalMonthlyOptimized),
             hasRedundancy,
-            nodeCount: nodesToCalculate.length, // 4. Update costs calculation
-            isSubtree: !!selectedNodeId // 4. Update costs calculation
+            nodeCount: nodesToCalculate.length,
+            isSubtree: !!selectedNodeId,
+            rootName // Return root name
         };
-    }, [nodes, edges, props.showSalary, props.loadedCostPercentage, selectedNodeId, getSubtreeNodes]); // 4. Update costs calculation dependencies
+    }, [nodes, edges, props.showSalary, props.loadedCostPercentage, selectedNodeId, getSubtreeNodes]);
 
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(val);
@@ -355,8 +360,8 @@ const OrgChartInner = (props) => {
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 onNodeDragStop={onNodeDragStop}
-                onNodeClick={onNodeClick} // Add onNodeClick
-                onPaneClick={onPaneClick} // Add onPaneClick
+                onNodeClick={onNodeClick}
+                onPaneClick={onPaneClick}
                 nodeTypes={nodeTypes}
                 nodesDraggable={true}
                 fitView
@@ -400,9 +405,9 @@ const OrgChartInner = (props) => {
                             alignItems: 'center'
                         }}>
                             <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-muted)' }}>
-                                Cost Analysis {costs.isSubtree ? '(Selected Team)' : '(Total Organization)'}
+                                Cost Analysis {costs.isSubtree ? `(${costs.rootName}'s Team)` : '(Total Organization)'}
                             </h3>
-                            <span style={{ fontSize: '10px', color: '#999' }}>Drag to move</span>
+                            <span className="no-export" style={{ fontSize: '10px', color: '#999' }}>Drag to move</span>
                         </div>
 
                         <div style={{ display: 'flex', gap: '20px' }}>
