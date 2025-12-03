@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import ReactFlow, {
     useNodesState,
     useEdgesState,
@@ -13,6 +13,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import dagre from 'dagre';
 import CustomNode from './CustomNode';
+import Draggable from 'react-draggable';
 
 const nodeWidth = 250;
 const nodeHeight = 160; // Increased height for salary
@@ -81,6 +82,7 @@ const nodeTypes = {
 const OrgChartInner = (props) => {
     const { data, onLayoutChange, focusNodeId, direction = 'TB', onViewportReady } = props;
     const { setCenter, fitView, getNodes, getEdges, getViewport, setViewport } = useReactFlow();
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
 
     // Expose viewport controls to parent
     React.useEffect(() => {
