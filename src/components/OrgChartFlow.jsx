@@ -458,11 +458,9 @@ const OrgChartInner = (props) => {
                             )}
                         </div>
                     </div>
-                </div>
                 </Draggable>
-    )
-}
-            </ReactFlow >
+            )}
+        </ReactFlow>
         </div >
     );
 };
