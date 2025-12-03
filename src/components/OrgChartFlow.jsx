@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import ReactFlow, {
     useNodesState,
     useEdgesState,
@@ -83,6 +83,8 @@ const OrgChartInner = (props) => {
     const { data, onLayoutChange, focusNodeId, direction = 'TB', onViewportReady } = props;
     const { setCenter, fitView, getNodes, getEdges, getViewport, setViewport } = useReactFlow();
     const [selectedNodeId, setSelectedNodeId] = useState(null);
+    const nodeRef = useRef(null); // Ref for Draggable
+    const nodeRef = useRef(null); // Ref for Draggable
 
     // Expose viewport controls to parent
     React.useEffect(() => {
@@ -375,8 +377,8 @@ const OrgChartInner = (props) => {
 
             {props.showSalary && costs && (
                 // 5. Wrap panel in Draggable
-                <Draggable bounds="parent" handle=".drag-handle">
-                    <div style={{
+                <Draggable bounds="parent" handle=".drag-handle" nodeRef={nodeRef}>
+                    <div ref={nodeRef} style={{
                         position: 'absolute',
                         top: 20,
                         left: 20,
