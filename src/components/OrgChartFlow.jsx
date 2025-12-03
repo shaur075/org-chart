@@ -245,15 +245,54 @@ const OrgChartInner = (props) => {
         }
     }, [nodes, props.onParentChange, props.onLayoutChange, getNodes, getEdges]);
 
+    const onNodeClick = useCallback((event, node) => {
+        setSelectedNodeId(node.id);
+    }, []);
+
+    const onPaneClick = useCallback(() => {
+        setSelectedNodeId(null);
+    }, []);
+
+    // 3. Helper to get all descendants of a node
+    const getSubtreeNodes = useCallback((allNodes, allEdges, rootId) => {
+        const descendants = new Set();
+        const queue = [rootId];
+        descendants.add(rootId);
+
+        while (queue.length > 0) {
+            const currentId = queue.shift();
+            // Find children: edges where source is currentId
+            const childrenIds = allEdges
+                .filter(e => e.source === currentId)
+                .map(e => e.target);
+
+            childrenIds.forEach(childId => {
+                if (!descendants.has(childId)) {
+                    descendants.add(childId);
+                    queue.push(childId);
+                }
+            });
+        }
+
+        return allNodes.filter(n => descendants.has(n.id));
+    }, []);
+
     // Calculate costs
     const costs = useMemo(() => {
         if (!props.showSalary) return null;
+
+        let nodesToCalculate = nodes;
+
+        // If a node is selected, filter for its subtree
+        if (selectedNodeId) {
+            nodesToCalculate = getSubtreeNodes(nodes, edges, selectedNodeId);
+        }
 
         let totalMonthlyAsIs = 0;
         let totalMonthlyOptimized = 0;
         let hasRedundancy = false;
 
-        nodes.forEach(node => {
+        nodesToCalculate.forEach(node => {
             const salaryStr = node.data.salary;
             let monthlyAmount = 0;
 
@@ -294,16 +333,18 @@ const OrgChartInner = (props) => {
         return {
             asIs: calculateMetrics(totalMonthlyAsIs),
             optimized: calculateMetrics(totalMonthlyOptimized),
-            hasRedundancy
+            hasRedundancy,
+            nodeCount: nodesToCalculate.length, // 4. Update costs calculation
+            isSubtree: !!selectedNodeId // 4. Update costs calculation
         };
-    }, [nodes, props.showSalary, props.loadedCostPercentage]);
+    }, [nodes, edges, props.showSalary, props.loadedCostPercentage, selectedNodeId, getSubtreeNodes]); // 4. Update costs calculation dependencies
 
     const formatCurrency = (val) => {
         return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(val);
     };
 
     return (
-        <div style={{ width: '100%', height: '80vh', background: '#f0f2f5' }}>
+        <div style={{ width: '100%', height: '80vh', background: '#f0f2f5', position: 'relative' }}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -311,6 +352,8 @@ const OrgChartInner = (props) => {
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 onNodeDragStop={onNodeDragStop}
+                onNodeClick={onNodeClick} // Add onNodeClick
+                onPaneClick={onPaneClick} // Add onPaneClick
                 nodeTypes={nodeTypes}
                 nodesDraggable={true}
                 fitView
@@ -326,27 +369,64 @@ const OrgChartInner = (props) => {
                         Scroll to Zoom • Drag to Pan • Drag Node to Change Supervisor
                     </div>
                 </Panel>
-                {props.showSalary && costs && (
-                    <Panel position="top-left">
-                        <div style={{
-                            background: 'var(--color-surface)',
-                            padding: '15px',
-                            borderRadius: '8px',
-                            border: '1px solid var(--color-border)',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                            minWidth: costs.hasRedundancy ? '400px' : '250px'
-                        }}>
-                            <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)', paddingBottom: '5px' }}>
-                                Cost Analysis
-                            </h3>
+            </ReactFlow>
 
-                            <div style={{ display: 'flex', gap: '20px' }}>
-                                {/* As-Is Column */}
-                                <div style={{ flex: 1 }}>
-                                    {costs.hasRedundancy && <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline' }}>As-Is</div>}
+            {props.showSalary && costs && (
+                // 5. Wrap panel in Draggable
+                <Draggable bounds="parent" handle=".drag-handle">
+                    <div style={{
+                        position: 'absolute',
+                        top: 20,
+                        left: 20,
+                        zIndex: 1000, // Ensure it's on top
+                        background: 'var(--color-surface)',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--color-border)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        minWidth: costs.hasRedundancy ? '400px' : '250px',
+                        cursor: 'default'
+                    }} className="cost-analysis-panel">
+                        <div className="drag-handle" style={{
+                            cursor: 'move',
+                            paddingBottom: '10px',
+                            marginBottom: '10px',
+                            borderBottom: '1px solid var(--color-border)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                                Cost Analysis {costs.isSubtree ? '(Selected Team)' : '(Total Organization)'}
+                            </h3>
+                            <span style={{ fontSize: '10px', color: '#999' }}>Drag to move</span>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            {/* As-Is Column */}
+                            <div style={{ flex: 1 }}>
+                                {costs.hasRedundancy && <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline' }}>As-Is</div>}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
+                                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.asIs.monthly)}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
+                                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.asIs.annual)}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
+                                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.asIs.fullyLoaded)}</span>
+                                </div>
+                            </div>
+
+                            {/* Optimized Column (only if redundancy exists) */}
+                            {costs.hasRedundancy && (
+                                <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
+                                    <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                         <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.asIs.monthly)}</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.optimized.monthly)}</span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                         <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
@@ -359,29 +439,31 @@ const OrgChartInner = (props) => {
                                 </div>
 
                                 {/* Optimized Column (only if redundancy exists) */}
-                                {costs.hasRedundancy && (
-                                    <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
-                                        <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
-                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.optimized.monthly)}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
-                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.optimized.annual)}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
-                                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
-                                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.optimized.fullyLoaded)}</span>
-                                        </div>
+                            {costs.hasRedundancy && (
+                                <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
+                                    <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.optimized.monthly)}</span>
                                     </div>
-                                )}
-                            </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.optimized.annual)}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
+                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.optimized.fullyLoaded)}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </Panel>
-                )}
-            </ReactFlow>
-        </div>
+                    </div>
+                </div>
+                </Draggable>
+    )
+}
+            </ReactFlow >
+        </div >
     );
 };
 
