@@ -420,25 +420,8 @@ const OrgChartInner = (props) => {
                                 </div>
                             </div>
 
-                            {/* Optimized Column (only if redundancy exists) */}
-                            {costs.hasRedundancy && (
-                                <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
-                                    <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Monthly:</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-text-main)' }}>{formatCurrency(costs.optimized.monthly)}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual:</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'green' }}>{formatCurrency(costs.asIs.annual)}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #ccc', paddingTop: '4px', marginTop: '4px' }}>
-                                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Fully Loaded:</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'blue' }}>{formatCurrency(costs.asIs.fullyLoaded)}</span>
-                                    </div>
-                                </div>
 
-                                {/* Optimized Column (only if redundancy exists) */}
+                            {/* Optimized Column (only if redundancy exists) */}
                             {costs.hasRedundancy && (
                                 <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
                                     <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px', textDecoration: 'underline', color: 'green' }}>Excl. Redundant</div>
