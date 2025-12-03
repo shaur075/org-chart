@@ -239,12 +239,15 @@ export const exportToDOCX = async (elementId, nodes) => {
             cacheBust: true,
             backgroundColor: '#ffffff',
             filter: (node) => {
-                if (node.classList) {
-                    return !node.classList.contains('react-flow__controls') &&
-                        !node.classList.contains('react-flow__minimap') &&
-                        !node.classList.contains('react-flow__attribution') &&
-                        !node.classList.contains('react-flow__background') &&
-                        !node.classList.contains('instruction-panel');
+                if (node.classList && (
+                    node.classList.contains('react-flow__controls') ||
+                    node.classList.contains('react-flow__minimap') ||
+                    node.classList.contains('react-flow__attribution') ||
+                    node.classList.contains('react-flow__background') ||
+                    node.classList.contains('instruction-panel') ||
+                    node.classList.contains('no-export')
+                )) {
+                    return false;
                 }
                 return true;
             },
