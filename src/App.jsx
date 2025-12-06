@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import DataInput from './components/DataInput';
 import OrgChartFlow from './components/OrgChartFlow';
 import ExportControls from './components/ExportControls';
