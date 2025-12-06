@@ -375,21 +375,26 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
             const isVacant = !node.data.name || node.data.name.toLowerCase() === 'vacant';
             const isRedundant = node.data.redundant && (node.data.redundant.toString().toUpperCase() === 'Y');
 
-            let fillColor = 'FFFFFF';
-            let borderColor = 'e2e8f0'; // Slate-200
+            // Default Styles (Matching CustomNode.jsx & index.css)
+            let fillColor = 'f0f2f5'; // var(--color-bg) - slightly gray
+            if (!isVacant) fillColor = 'FFFFFF'; // var(--color-surface) - white
+
+            let borderColor = '333333'; // Dark Gray for standard nodes
             let borderType = 'solid';
-            let borderWidth = 1;
-            let avatarBg = '6366f1'; // Indigo-500 (Primary)
+            let borderWidth = 2; // 2px solid #333
+
+            let avatarBg = '2563eb'; // var(--color-primary) - Blue #2563eb
             let avatarText = 'FFFFFF';
 
             if (isVacant) {
-                fillColor = 'f8fafc'; // Slate-50
-                borderColor = 'cbd5e1'; // Slate-300
-                borderType = 'dash';
-                avatarBg = 'cbd5e1'; // Slate-300
+                fillColor = 'f0f2f5'; // var(--color-bg)
+                borderColor = '666666'; // #666
+                borderType = 'dash'; // 2px dashed
+                borderWidth = 2;
+                avatarBg = 'e2e8f0'; // var(--color-border) - Slate-200/300 approx
             } else if (isRedundant) {
-                borderColor = 'ef4444'; // Red-500
-                borderWidth = 2.5;
+                borderColor = 'FF0000'; // Red
+                borderWidth = 3; // 3px solid red
             }
 
             // Main Box with Shadow
@@ -403,7 +408,6 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
 
             // Avatar Circle (Top Left)
             // Position: -25px top, 15px left relative to node
-            // In inches:
             const avatarSizePx = 50;
             const avatarSizeIn = pxToIn(avatarSizePx);
             const avatarX = x + pxToIn(15);
@@ -411,8 +415,7 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
 
             slide.addShape('oval', {
                 x: avatarX, y: avatarY, w: avatarSizeIn, h: avatarSizeIn,
-                fill: { color: avatarBg }, // Ensure this is a hex string without # if possible, but pptxgenjs handles # usually.
-                // Let's strip # just in case, though '6366f1' is already stripped.
+                fill: { color: avatarBg },
                 line: { color: 'FFFFFF', width: 2 }, // White border
                 shadow: { type: 'outer', color: '000000', opacity: 0.1, blur: 2, offset: 1 }
             });
@@ -425,13 +428,13 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
                 bold: true,
                 align: 'center',
                 valign: 'middle',
-                color: avatarText
+                color: isVacant ? '64748b' : avatarText // Darker text for vacant avatar
             });
 
             // Name
             slide.addText(node.data.name || 'Vacant', {
                 x: x, y: y + pxToIn(35), w: w, h: 0.3,
-                fontSize: 16,
+                fontSize: 18, // Increased from 16
                 bold: true,
                 align: 'center',
                 color: '1e293b' // Slate-800
@@ -440,8 +443,8 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
             // Designation
             slide.addText(node.data.designation || '', {
                 x: x, y: y + pxToIn(65), w: w, h: 0.25,
-                fontSize: 12,
-                color: '6366f1', // Primary-500 (Indigo)
+                fontSize: 14, // Increased from 12
+                color: '64748b', // Slate-500 (Muted)
                 align: 'center'
             });
 
@@ -449,7 +452,7 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
             if (node.data.band) {
                 slide.addText(`Band: ${node.data.band}`, {
                     x: x, y: y + pxToIn(90), w: w, h: 0.2,
-                    fontSize: 11,
+                    fontSize: 12, // Increased from 11
                     color: '64748b', // Slate-500
                     align: 'center'
                 });
@@ -460,17 +463,20 @@ export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage
                 // Separator line
                 slide.addShape('line', {
                     x: x + pxToIn(20), y: y + pxToIn(120), w: w - pxToIn(40), h: 0,
-                    line: { color: 'f1f5f9', width: 1 } // Slate-100
+                    line: { color: 'e2e8f0', width: 1 } // var(--color-border)
                 });
 
                 slide.addText(node.data.salary, {
                     x: x, y: y + pxToIn(125), w: w, h: 0.2,
-                    fontSize: 12,
+                    fontSize: 14, // Increased from 12
+                    color: '2563eb', // var(--color-primary)
                     bold: true,
-                    color: '059669', // Emerald-600
                     align: 'center'
                 });
             }
+
+            // Custom Fields (simplified for PPTX space)
+            // ... (omitted for brevity, can add if needed)
         });
 
         pptx.writeFile({ fileName: 'OrgChart_Editable.pptx' });
