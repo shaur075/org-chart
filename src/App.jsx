@@ -415,10 +415,10 @@ function App() {
                   textNodes={textNodes}
                   onParentChange={handleParentChange}
                   onNodeDataChange={handleNodeDataChange}
-                  onLayoutChange={(nodes, edges) => {
+                  onLayoutChange={useCallback((nodes, edges) => {
                     setCurrentNodes(nodes);
                     setCurrentEdges(edges);
-                  }}
+                  }, [])}
                 />
               </div>
               {showStats && (

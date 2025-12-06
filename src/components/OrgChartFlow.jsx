@@ -148,7 +148,11 @@ const OrgChartInner = (props) => {
 
         setNodes(allNodes);
         setEdges(layoutedEdges);
-    }, [initialNodes, initialEdges, direction, props.textNodes, setNodes, setEdges]);
+
+        if (props.onLayoutChange) {
+            props.onLayoutChange(allNodes, layoutedEdges);
+        }
+    }, [initialNodes, initialEdges, direction, props.textNodes, setNodes, setEdges, props.onLayoutChange]);
 
     // Handle Focus Node
     useEffect(() => {
