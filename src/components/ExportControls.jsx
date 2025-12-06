@@ -41,7 +41,7 @@ const ExportControls = ({ data, chartId, nodes, edges, getViewport, setViewport,
                 <FileText size={18} /> PDF
             </button>
 
-            <button className="btn" onClick={() => handleExport(exportToPPTX, 'org-chart-container', nodes)} title="Export as PPTX">
+            <button className="btn" onClick={() => handleExport(exportToPPTX, 'org-chart-container', nodes, edges)} title="Export as PPTX">
                 <Presentation size={18} /> PPTX
             </button>
 
