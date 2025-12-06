@@ -235,21 +235,21 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
                     const lineWidth = 1.5;
 
                     // Segment 1: Vertical down
-                    slide.addShape(pptx.ShapeType.line, {
+                    slide.addShape('line', {
                         x: pxToIn(startX), y: pxToIn(startY),
                         w: 0, h: pxToIn(midY - startY),
                         line: { color: lineColor, width: lineWidth }
                     });
 
                     // Segment 2: Horizontal
-                    slide.addShape(pptx.ShapeType.line, {
+                    slide.addShape('line', {
                         x: pxToIn(Math.min(startX, endX)), y: pxToIn(midY),
                         w: pxToIn(Math.abs(endX - startX)), h: 0,
                         line: { color: lineColor, width: lineWidth }
                     });
 
                     // Segment 3: Vertical down to target
-                    slide.addShape(pptx.ShapeType.line, {
+                    slide.addShape('line', {
                         x: pxToIn(endX), y: pxToIn(midY),
                         w: 0, h: pxToIn(endY - midY),
                         line: { color: lineColor, width: lineWidth }
@@ -287,7 +287,7 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
             }
 
             // Main Box with Shadow
-            slide.addShape(pptx.ShapeType.rect, {
+            slide.addShape('rect', {
                 x: x, y: y, w: w, h: h,
                 fill: { color: fillColor },
                 line: { color: borderColor, width: borderWidth, dashType: borderType },
@@ -303,7 +303,7 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
             const avatarX = x + pxToIn(15);
             const avatarY = y - pxToIn(25);
 
-            slide.addShape(pptx.ShapeType.oval, {
+            slide.addShape('oval', {
                 x: avatarX, y: avatarY, w: avatarSizeIn, h: avatarSizeIn,
                 fill: { color: avatarBg },
                 line: { color: 'FFFFFF', width: 2 }, // White border
@@ -351,7 +351,7 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
             // Salary (if shown)
             if (node.data.showSalary && node.data.salary) {
                 // Separator line
-                slide.addShape(pptx.ShapeType.line, {
+                slide.addShape('line', {
                     x: x + pxToIn(20), y: y + pxToIn(120), w: w - pxToIn(40), h: 0,
                     line: { color: 'f1f5f9', width: 1 } // Slate-100
                 });
