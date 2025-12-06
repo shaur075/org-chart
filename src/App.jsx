@@ -403,6 +403,7 @@ function App() {
                     getViewport={viewportControls?.getViewport}
                     setViewport={viewportControls?.setViewport}
                     fitView={viewportControls?.fitView}
+                    loadedCostPercentage={loadedCostPercentage}
                   />
                   <button className="btn" onClick={addTextNode}>Add Text</button>
                   <button className="btn" onClick={onEditClick}>Edit Data</button>

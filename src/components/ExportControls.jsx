@@ -2,7 +2,7 @@ import React from 'react';
 import { Download, FileImage, FileText, Presentation } from 'lucide-react';
 import { exportToPNG, exportToPDF, exportToPPTX, exportToDOCX } from '../utils/exportUtils';
 
-const ExportControls = ({ data, chartId, nodes, edges, getViewport, setViewport, fitView }) => {
+const ExportControls = ({ data, chartId, nodes, edges, getViewport, setViewport, fitView, loadedCostPercentage }) => {
 
     const handleExport = async (exportFn, ...args) => {
         if (!getViewport || !setViewport) {
@@ -41,7 +41,7 @@ const ExportControls = ({ data, chartId, nodes, edges, getViewport, setViewport,
                 <FileText size={18} /> PDF
             </button>
 
-            <button className="btn" onClick={() => handleExport(exportToPPTX, 'org-chart-container', nodes, edges)} title="Export as PPTX">
+            <button className="btn" onClick={() => handleExport(exportToPPTX, 'org-chart-container', nodes, edges, loadedCostPercentage)} title="Export as PPTX">
                 <Presentation size={18} /> PPTX
             </button>
 

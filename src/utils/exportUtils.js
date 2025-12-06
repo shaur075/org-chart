@@ -164,7 +164,7 @@ export const exportToPDF = async (elementId, nodes, fileName = 'org-chart.pdf') 
     }
 };
 
-export const exportToPPTX = async (elementId, nodes, edges) => {
+export const exportToPPTX = async (elementId, nodes, edges, loadedCostPercentage = 125) => {
     try {
         if (!nodes || nodes.length === 0) {
             alert("No nodes to export!");
@@ -204,6 +204,112 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
             if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
             return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
         };
+
+        // Helper to format currency
+        const formatCurrency = (val) => {
+            return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(val);
+        };
+
+        // --- Cost Calculation Logic ---
+        let showCostPanel = false;
+        let totalMonthlyAsIs = 0;
+        let totalMonthlyOptimized = 0;
+        let hasRedundancy = false;
+
+        nodes.forEach(node => {
+            if (node.data.showSalary) showCostPanel = true;
+
+            const salaryStr = node.data.salary;
+            let monthlyAmount = 0;
+
+            if (salaryStr) {
+                let cleanStr = salaryStr.toString().replace(/[$,]/g, '').toLowerCase();
+                let multiplier = 1;
+                if (cleanStr.includes('k')) {
+                    multiplier = 1000;
+                    cleanStr = cleanStr.replace('k', '');
+                }
+                const amount = parseFloat(cleanStr);
+                if (!isNaN(amount)) {
+                    monthlyAmount = amount * multiplier;
+                }
+            }
+
+            totalMonthlyAsIs += monthlyAmount;
+
+            const isRedundant = node.data.redundant && (node.data.redundant.toString().toUpperCase() === 'Y' || node.data.redundant.toString().toUpperCase() === 'YES');
+            if (isRedundant) {
+                hasRedundancy = true;
+            } else {
+                totalMonthlyOptimized += monthlyAmount;
+            }
+        });
+
+        const calculateMetrics = (monthly) => {
+            const annual = monthly * 12;
+            const fullyLoaded = annual * (loadedCostPercentage / 100);
+            return { monthly, annual, fullyLoaded };
+        };
+
+        const costs = {
+            asIs: calculateMetrics(totalMonthlyAsIs),
+            optimized: calculateMetrics(totalMonthlyOptimized),
+            hasRedundancy
+        };
+
+        // --- Draw Cost Panel (Top Left) ---
+        if (showCostPanel) {
+            const panelX = 0.2; // inches
+            const panelY = 0.2; // inches
+            const panelW = costs.hasRedundancy ? 4.5 : 3.0; // Wider if redundancy column needed
+            const panelH = 1.5;
+
+            // Panel Background
+            slide.addShape('rect', {
+                x: panelX, y: panelY, w: panelW, h: panelH,
+                fill: { color: 'FFFFFF' },
+                line: { color: 'e2e8f0', width: 1 },
+                rectRadius: 0.1,
+                shadow: { type: 'outer', color: '000000', opacity: 0.1, blur: 5, offset: 2 }
+            });
+
+            // Header
+            slide.addText("Cost Analysis (Total Organization)", {
+                x: panelX + 0.1, y: panelY + 0.1, w: panelW - 0.2, h: 0.2,
+                fontSize: 12, color: '64748b', bold: false
+            });
+
+            // Columns
+            const col1X = panelX + 0.1;
+            const colWidth = (panelW - 0.2) / (costs.hasRedundancy ? 2 : 1);
+
+            // As-Is Column
+            let currentY = panelY + 0.4;
+            if (costs.hasRedundancy) {
+                slide.addText("As-Is", { x: col1X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, bold: true, underline: true });
+                currentY += 0.2;
+            }
+
+            slide.addText(`Monthly: ${formatCurrency(costs.asIs.monthly)}`, { x: col1X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '1e293b' });
+            currentY += 0.2;
+            slide.addText(`Annual: ${formatCurrency(costs.asIs.annual)}`, { x: col1X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '16a34a', bold: true }); // Green
+            currentY += 0.2;
+            slide.addText(`Fully Loaded: ${formatCurrency(costs.asIs.fullyLoaded)}`, { x: col1X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '2563eb', bold: true }); // Blue
+
+            // Optimized Column
+            if (costs.hasRedundancy) {
+                const col2X = col1X + colWidth;
+                currentY = panelY + 0.4;
+                slide.addText("Excl. Redundant", { x: col2X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, bold: true, underline: true, color: '16a34a' });
+                currentY += 0.2;
+
+                slide.addText(`Monthly: ${formatCurrency(costs.optimized.monthly)}`, { x: col2X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '1e293b' });
+                currentY += 0.2;
+                slide.addText(`Annual: ${formatCurrency(costs.optimized.annual)}`, { x: col2X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '16a34a', bold: true });
+                currentY += 0.2;
+                slide.addText(`Fully Loaded: ${formatCurrency(costs.optimized.fullyLoaded)}`, { x: col2X, y: currentY, w: colWidth, h: 0.2, fontSize: 10, color: '2563eb', bold: true });
+            }
+        }
 
         // 1. Draw Edges (Connectors) first so they are behind nodes
         if (edges) {
@@ -305,7 +411,8 @@ export const exportToPPTX = async (elementId, nodes, edges) => {
 
             slide.addShape('oval', {
                 x: avatarX, y: avatarY, w: avatarSizeIn, h: avatarSizeIn,
-                fill: { color: avatarBg },
+                fill: { color: avatarBg }, // Ensure this is a hex string without # if possible, but pptxgenjs handles # usually.
+                // Let's strip # just in case, though '6366f1' is already stripped.
                 line: { color: 'FFFFFF', width: 2 }, // White border
                 shadow: { type: 'outer', color: '000000', opacity: 0.1, blur: 2, offset: 1 }
             });
