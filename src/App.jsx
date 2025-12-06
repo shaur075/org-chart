@@ -196,22 +196,24 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="container">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Org Chart Generator
-            </h1>
-            <p className="text-muted mt-1">
-              Create, visualize, and export professional organization charts.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button className="btn btn-ghost" onClick={() => setShowHistory(true)} title="View History">
-              <History size={18} /> History
-            </button>
-            <button className="btn btn-ghost text-sm" onClick={() => setShowDebug(!showDebug)}>
-              {showDebug ? 'Hide Debug' : 'Show Debug'}
-            </button>
+        <header className="glass-panel" style={{ padding: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                Org Chart Generator
+              </h1>
+              <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--spacing-xs)' }}>
+                Create, visualize, and export professional organization charts.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn" onClick={() => setShowHistory(true)} title="View History">
+                <History size={16} style={{ marginRight: '5px' }} /> History
+              </button>
+              <button className="btn" onClick={() => setShowDebug(!showDebug)} style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                {showDebug ? 'Hide Debug' : 'Show Debug'}
+              </button>
+            </div>
           </div>
         </header>
 
@@ -219,42 +221,50 @@ function App() {
         {showHistory && (
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 1000,
-            backdropFilter: 'blur(4px)'
-          }} className="flex-center">
-            <div className="card bg-white p-6 w-[500px] max-h-[80vh] overflow-y-auto shadow-xl" style={{ width: '500px', padding: '1.5rem' }}>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Chart History</h2>
-                <button onClick={() => setShowHistory(false)} className="btn btn-ghost p-1">
-                  <X size={20} />
+            backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
+            display: 'flex', justifyContent: 'center', alignItems: 'center'
+          }}>
+            <div className="glass-panel" style={{ width: '500px', maxHeight: '80vh', overflowY: 'auto', padding: '20px', background: 'white' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ margin: 0 }}>Chart History</h2>
+                <button onClick={() => setShowHistory(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                  <X size={24} />
                 </button>
               </div>
 
               {historyItems.length === 0 ? (
-                <p className="text-muted text-center py-8">No history yet.</p>
+                <p style={{ color: '#666', textAlign: 'center' }}>No history yet.</p>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {historyItems.map((item) => (
-                    <div key={item.id}
-                      className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors flex justify-between items-center group"
+                    <div key={item.id} style={{
+                      padding: '15px', border: '1px solid #eee', borderRadius: '8px',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      cursor: 'pointer', transition: 'background 0.2s'
+                    }}
                       onClick={() => loadFromHistory(item)}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
                       <div>
-                        <div className="font-medium text-slate-800">{item.summary}</div>
-                        <div className="text-xs text-muted flex items-center mt-1">
-                          <Clock size={12} className="mr-1" />
+                        <div style={{ fontWeight: 'bold' }}>{item.summary}</div>
+                        <div style={{ fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', marginTop: '4px' }}>
+                          <Clock size={12} style={{ marginRight: '4px' }} />
                           {new Date(item.timestamp).toLocaleString()}
                         </div>
                       </div>
-                      <div className="text-xs text-primary-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Load</div>
+                      <div style={{ fontSize: '12px', color: 'blue' }}>Load</div>
                     </div>
                   ))}
                   <button
                     onClick={handleClearHistory}
-                    className="btn w-full mt-4 text-red-600 hover:bg-red-50 border-red-100"
-                    style={{ color: '#dc2626', borderColor: '#fee2e2', backgroundColor: '#fef2f2' }}
+                    style={{
+                      marginTop: '10px', padding: '10px', border: '1px solid #fee2e2',
+                      background: '#fef2f2', color: '#dc2626', borderRadius: '6px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+                    }}
                   >
-                    <Trash2 size={16} className="mr-2" /> Clear History
+                    <Trash2 size={16} style={{ marginRight: '5px' }} /> Clear History
                   </button>
                 </div>
               )}
@@ -293,17 +303,21 @@ function App() {
             <DataInput onDataLoaded={handleDataLoaded} initialData={editingData} />
           ) : (
             <>
-              <div className="glass-panel sticky top-4 z-50 mb-6 p-4 flex flex-wrap items-center justify-between gap-4">
-                <h2 className="text-lg font-semibold whitespace-nowrap">
-                  Chart Loaded <span className="text-muted font-normal text-sm">({filteredData.length} employees)</span>
-                </h2>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="w-64">
-                    <SearchBar data={filteredData} onSelect={(id) => setFocusNodeId(id)} />
-                  </div>
-
-                  <div className="h-8 w-px bg-slate-200 mx-1"></div>
+              <div className="glass-panel" style={{
+                marginBottom: 'var(--spacing-lg)',
+                padding: 'var(--spacing-md)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                position: 'sticky',
+                top: '10px',
+                zIndex: 100,
+                backdropFilter: 'blur(10px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)'
+              }}>
+                <h2 style={{ margin: 0 }}>Chart Loaded ({filteredData.length} employees)</h2>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <SearchBar data={filteredData} onSelect={(id) => setFocusNodeId(id)} />
 
                   <button
                     className="btn"
@@ -318,32 +332,34 @@ function App() {
                     onClick={() => setIsDarkMode(prev => !prev)}
                     title="Toggle Dark Mode"
                   >
-                    {isDarkMode ? '☀️' : '🌙'}
+                    {isDarkMode ? '☀️ Light' : '🌙 Dark'}
                   </button>
 
                   <button
-                    className={`btn ${showSalary ? 'bg-slate-100' : ''}`}
+                    className="btn"
                     onClick={() => setShowSalary(prev => !prev)}
                     title={showSalary ? "Hide Salary" : "Show Salary"}
                   >
-                    {showSalary ? 'Hide Salary' : 'Show Salary'}
+                    {showSalary ? '👁️ Hide Salary' : '👁️ Show Salary'}
                   </button>
 
                   {showSalary && (
-                    <div className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
-                      <span className="text-xs font-semibold text-slate-600">Cost %:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.05)', padding: '5px 10px', borderRadius: '5px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Loaded Cost %:</span>
                       <input
                         type="number"
                         value={loadedCostPercentage}
                         onChange={(e) => setLoadedCostPercentage(Number(e.target.value))}
-                        className="w-16 h-7 text-sm px-1 py-0 border-slate-300"
+                        style={{ width: '50px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                       />
                     </div>
                   )}
 
-                  <div className="h-8 w-px bg-slate-200 mx-1"></div>
-
-                  <button className="btn" onClick={() => setShowStats(true)}>
+                  <button
+                    className="btn"
+                    onClick={() => setShowStats(true)}
+                    title="View Statistics"
+                  >
                     📊 Stats
                   </button>
 
@@ -356,6 +372,7 @@ function App() {
                         alert('Link copied to clipboard!');
                       }
                     }}
+                    title="Share Chart"
                   >
                     🔗 Share
                   </button>
@@ -364,7 +381,8 @@ function App() {
                     <select
                       value={selectedDepartment}
                       onChange={(e) => setSelectedDepartment(e.target.value)}
-                      className="h-9 border-slate-200 rounded-md text-sm min-w-[120px]"
+                      className="btn"
+                      style={{ paddingRight: '25px' }}
                     >
                       {uniqueDepartments.map(dept => (
                         <option key={dept} value={dept}>{dept}</option>
@@ -381,15 +399,12 @@ function App() {
                     setViewport={viewportControls?.setViewport}
                     fitView={viewportControls?.fitView}
                   />
-
-                  <div className="h-8 w-px bg-slate-200 mx-1"></div>
-
-                  <button className="btn" onClick={addTextNode}>+ Text</button>
+                  <button className="btn" onClick={addTextNode}>Add Text</button>
                   <button className="btn" onClick={onEditClick}>Edit Data</button>
-                  <button className="btn text-red-600 hover:bg-red-50" onClick={() => { setOrgData(null); setEditingData(null); }}>Reset</button>
+                  <button className="btn" onClick={() => { setOrgData(null); setEditingData(null); }}>Reset / New Chart</button>
                 </div>
               </div>
-              <div id="org-chart-container" className="glass-panel overflow-hidden h-[80vh] border border-slate-200 shadow-inner bg-slate-50/50" style={{ height: '80vh' }}>
+              <div id="org-chart-container" className="glass-panel" style={{ padding: 'var(--spacing-md)', overflow: 'hidden', height: '80vh' }}>
                 <OrgChartFlow
                   data={filteredData}
                   focusNodeId={focusNodeId}

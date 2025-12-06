@@ -243,24 +243,26 @@ const DataInput = ({ onDataLoaded, initialData }) => {
     };
 
     return (
-        <div className="glass-panel max-w-5xl mx-auto p-8">
-            <div className="flex gap-4 mb-8">
+        <div className="glass-panel" style={{ padding: 'var(--spacing-lg)', maxWidth: '1000px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
                 <button
-                    className={`btn flex-1 py-3 text-base ${activeTab === 'upload' ? 'btn-primary' : 'bg-white hover:bg-slate-50'}`}
+                    className={`btn ${activeTab === 'upload' ? 'btn-primary' : ''} `}
                     onClick={() => setActiveTab('upload')}
+                    style={{ flex: 1 }}
                 >
-                    <FileSpreadsheet size={20} className="mr-2" />
+                    <FileSpreadsheet size={18} style={{ marginRight: '8px', verticalAlign: 'text-bottom' }} />
                     Upload Excel
                 </button>
                 <button
-                    className={`btn flex-1 py-3 text-base ${activeTab === 'manual' ? 'btn-primary' : 'bg-white hover:bg-slate-50'}`}
+                    className={`btn ${activeTab === 'manual' ? 'btn-primary' : ''} `}
                     onClick={() => setActiveTab('manual')}
+                    style={{ flex: 1 }}
                 >
-                    <Plus size={20} className="mr-2" />
+                    <Plus size={18} style={{ marginRight: '8px', verticalAlign: 'text-bottom' }} />
                     Manual Entry
                 </button>
                 <button
-                    className="btn flex-1 py-3 text-base bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200"
+                    className="btn"
                     onClick={() => {
                         const demoData = [
                             { ID: '1', Name: 'CEO', Designation: 'Chief Executive Officer', Salary: '200000', SupervisorID: '' },
@@ -271,6 +273,7 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                         ];
                         processData(demoData);
                     }}
+                    style={{ flex: 1, background: '#e0e7ff', color: '#3730a3' }}
                 >
                     🚀 Load Demo
                 </button>
@@ -278,7 +281,14 @@ const DataInput = ({ onDataLoaded, initialData }) => {
 
             {activeTab === 'upload' ? (
                 <div
-                    className="border-2 border-dashed border-slate-300 rounded-xl p-12 text-center cursor-pointer transition-all hover:border-primary-500 hover:bg-slate-50 group"
+                    style={{
+                        border: '2px dashed var(--color-border)',
+                        borderRadius: 'var(--radius-lg)',
+                        padding: 'var(--spacing-xl)',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'border-color 0.2s'
+                    }}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                         e.preventDefault();
@@ -294,132 +304,130 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                         style={{ display: 'none' }}
                         id="file-upload"
                     />
-                    <label htmlFor="file-upload" className="cursor-pointer block">
-                        <div className="bg-slate-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-50 transition-colors">
-                            <Upload size={32} className="text-slate-400 group-hover:text-primary-600" />
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2 text-slate-700">Click or Drag Excel File Here</h3>
-                        <p className="text-muted text-sm">
+                    <label htmlFor="file-upload" style={{ cursor: 'pointer', display: 'block' }}>
+                        <Upload size={48} color="var(--color-primary)" style={{ marginBottom: 'var(--spacing-md)' }} />
+                        <h3 style={{ marginBottom: 'var(--spacing-sm)' }}>Click or Drag Excel File Here</h3>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                             Supported formats: .xlsx, .xls
                         </p>
                     </label>
                 </div>
             ) : (
                 <div>
-                    <div className="max-h-[500px] overflow-y-auto mb-6 border border-slate-200 rounded-lg shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 z-10">
-                                <tr>
-                                    <th className="px-4 py-3 font-semibold">ID</th>
-                                    <th className="px-4 py-3 font-semibold">Name</th>
-                                    <th className="px-4 py-3 font-semibold">Designation</th>
-                                    <th className="px-4 py-3 font-semibold w-20">Band</th>
-                                    <th className="px-4 py-3 font-semibold w-24">Salary</th>
-                                    <th className="px-4 py-3 font-semibold w-24">Sup. ID</th>
-                                    <th className="px-4 py-3 font-semibold">Sup. Name</th>
-                                    <th className="px-4 py-3 font-semibold w-24">Type</th>
-                                    <th className="px-4 py-3 font-semibold w-24">Redundant</th>
+                    <div style={{ maxHeight: '400px', overflowY: 'auto', marginBottom: 'var(--spacing-md)' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                            <thead>
+                                <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>
+                                    <th style={{ padding: '8px', width: '100px' }}>ID</th>
+                                    <th style={{ padding: '8px', width: '150px' }}>Name</th>
+                                    <th style={{ padding: '8px', width: '150px' }}>Designation</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Band</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Salary</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Sup. ID</th>
+                                    <th style={{ padding: '8px', width: '150px' }}>Sup. Name</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Type</th>
+                                    <th style={{ padding: '8px', width: '80px' }}>Redundant</th>
                                     {customFields.map(f => (
-                                        <th key={f} className="px-4 py-3 font-semibold">{f}</th>
+                                        <th key={f} style={{ padding: '8px', width: '100px' }}>{f}</th>
                                     ))}
-                                    <th className="px-4 py-3 w-12 text-center">
-                                        <button onClick={addCustomField} title="Add Column" className="text-primary-600 hover:text-primary-800">
+                                    <th style={{ padding: '8px', width: '50px' }}>
+                                        <button onClick={addCustomField} title="Add Column" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                                             <Plus size={16} />
                                         </button>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 bg-white">
+                            <tbody>
                                 {manualData.map((row, index) => (
-                                    <tr key={index} className="hover:bg-slate-50">
-                                        <td className="p-2">
+                                    <tr key={index} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.id}
                                                 onChange={(e) => handleManualChange(index, 'id', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.name}
                                                 onChange={(e) => handleManualChange(index, 'name', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.designation}
                                                 onChange={(e) => handleManualChange(index, 'designation', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.band || ''}
                                                 onChange={(e) => handleManualChange(index, 'band', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.salary || ''}
                                                 onChange={(e) => handleManualChange(index, 'salary', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.supervisorId}
                                                 onChange={(e) => handleManualChange(index, 'supervisorId', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <input
                                                 type="text"
                                                 value={row.supervisorName || ''}
                                                 onChange={(e) => handleManualChange(index, 'supervisorName', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             />
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <select
                                                 value={row.type}
                                                 onChange={(e) => handleManualChange(index, 'type', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             >
                                                 <option value="Direct">Direct</option>
                                                 <option value="Dotted">Dotted</option>
                                             </select>
                                         </td>
-                                        <td className="p-2">
+                                        <td style={{ padding: '8px' }}>
                                             <select
                                                 value={row.redundant || 'N'}
                                                 onChange={(e) => handleManualChange(index, 'redundant', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                             >
                                                 <option value="N">No</option>
                                                 <option value="Y">Yes</option>
                                             </select>
                                         </td>
                                         {customFields.map(f => (
-                                            <td key={f} className="p-2">
+                                            <td key={f} style={{ padding: '8px' }}>
                                                 <input
                                                     type="text"
                                                     value={row[f] || ''}
                                                     onChange={(e) => handleManualChange(index, f, e.target.value)}
-                                                    className="w-full px-2 py-1 text-sm border-slate-200 focus:border-primary-500 rounded"
+                                                    style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                                                 />
                                             </td>
                                         ))}
-                                        <td className="p-2 text-center">
-                                            <button onClick={() => removeRow(index)} className="text-slate-400 hover:text-red-500 transition-colors">
+                                        <td style={{ padding: '8px' }}>
+                                            <button onClick={() => removeRow(index)} style={{ color: 'red', background: 'none', border: 'none' }}>
                                                 <Trash2 size={16} />
                                             </button>
                                         </td>
@@ -428,11 +436,11 @@ const DataInput = ({ onDataLoaded, initialData }) => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="flex justify-between">
-                        <button className="btn bg-white border-slate-300 hover:bg-slate-50" onClick={addRow}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <button className="btn" onClick={addRow} style={{ border: '1px solid var(--color-border)' }}>
                             + Add Row
                         </button>
-                        <button className="btn btn-primary px-8" onClick={submitManualData}>
+                        <button className="btn btn-primary" onClick={submitManualData}>
                             Generate Chart
                         </button>
                     </div>
