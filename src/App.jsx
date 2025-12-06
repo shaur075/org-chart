@@ -191,8 +191,6 @@ function App() {
     // But since we use onBlur in CustomNode (planned), it's fine.
     const updatedHistory = saveChartToHistory(newData);
     setHistoryItems(updatedHistory);
-    const updatedHistory = saveChartToHistory(newData);
-    setHistoryItems(updatedHistory);
   };
 
   const handleLayoutChange = useCallback((nodes, edges) => {
