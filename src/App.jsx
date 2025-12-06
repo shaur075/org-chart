@@ -191,7 +191,14 @@ function App() {
     // But since we use onBlur in CustomNode (planned), it's fine.
     const updatedHistory = saveChartToHistory(newData);
     setHistoryItems(updatedHistory);
+    const updatedHistory = saveChartToHistory(newData);
+    setHistoryItems(updatedHistory);
   };
+
+  const handleLayoutChange = useCallback((nodes, edges) => {
+    setCurrentNodes(nodes);
+    setCurrentEdges(edges);
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -415,10 +422,7 @@ function App() {
                   textNodes={textNodes}
                   onParentChange={handleParentChange}
                   onNodeDataChange={handleNodeDataChange}
-                  onLayoutChange={useCallback((nodes, edges) => {
-                    setCurrentNodes(nodes);
-                    setCurrentEdges(edges);
-                  }, [])}
+                  onLayoutChange={handleLayoutChange}
                 />
               </div>
               {showStats && (
